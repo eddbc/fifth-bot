@@ -23,7 +23,7 @@ func (f *Fifth) status(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Co
 	if status.Vip {
 		_, err = ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Server is in VIP Mode! Current Players: %d\n", status.Players))
 	} else {
-		_, err = ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Current Players: %d\n", status.Players))
+		_, err = ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Current Players on TQ: %d\n", status.Players))
 	}
 
 	if err != nil {

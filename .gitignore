@@ -1,5 +1,4 @@
 /.idea/
-
 /fifth-bot*
-
 /run*
+/.env

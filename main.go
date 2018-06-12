@@ -18,6 +18,8 @@ import (
 	"github.com/gregjones/httpcache"
 )
 
+import _ "github.com/joho/godotenv/autoload"
+
 // Version is a constant that stores the Disgord version information.
 const Version = "v0.0.0-alpha"
 
