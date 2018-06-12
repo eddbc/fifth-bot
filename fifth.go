@@ -1,9 +1,9 @@
 package main
 
 import (
-"github.com/bwmarrin/discordgo"
-"github.com/eddbc/fifth-bot/mux"
-"log"
+	"github.com/bwmarrin/discordgo"
+	"github.com/eddbc/fifth-bot/mux"
+	"log"
 	"context"
 	"fmt"
 )
@@ -28,5 +28,27 @@ func (f *Fifth) status(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Co
 
 	if err != nil {
 		log.Printf("error sending message, %s\n", err)
+	}
+}
+
+func (f *Fifth) who(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
+
+	name := ""
+
+	for k, v := range ctx.Fields {
+		if k != 0 {
+			name+=v
+			if k<len(ctx.Fields) {
+				name+=" "
+			}
+		}
+	}
+
+	embed, err := getCharacterInfoEmbed(name)
+
+	if err == nil{
+		ds.ChannelMessageSendEmbed(dm.ChannelID, embed)
+	} else {
+		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Error :warning: %s\n", err))
 	}
 }

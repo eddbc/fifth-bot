@@ -23,4 +23,5 @@ func init() {
 	Router.Route("help", "Display this message", Router.Help)
 
 	Router.Route("status", "Get EVE Tranquility server status", f.status)
+	Router.Route("who", "Get info about an EVE character", f.who)
 }

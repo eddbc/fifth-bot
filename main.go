@@ -38,11 +38,11 @@ func init() {
 	client := &http.Client{Transport: transport}
 
 	// Get our API Client.
-	esiClient := goesi.NewAPIClient(client, "test app, edd_reynolds on slack")
+	esiClient := goesi.NewAPIClient(client, "fifth-bot, edd_reynolds on slack")
 	eve = esiClient.ESI
 
 	// Discord Authentication Token
-	Session.Token = os.Getenv("DG_TOKEN")
+	Session.Token = os.Getenv("FTH_BT_TOKEN")
 	if Session.Token == "" {
 		flag.StringVar(&Session.Token, "t", "", "Discord Authentication Token")
 	}
