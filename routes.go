@@ -20,7 +20,7 @@ func init() {
 	f := Fifth{}
 
 	// Register the build-in help command.
-	Router.Route("help", "Display this message.", Router.Help)
+	Router.Route("help", "Display this message", Router.Help)
 
-	Router.Route("test", "sdfsd", f.test)
+	Router.Route("status", "Get EVE Tranquility server status", f.status)
 }

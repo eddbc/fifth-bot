@@ -9,9 +9,13 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"net/http"
 	"syscall"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/antihax/goesi"
+	"github.com/antihax/goesi/esi"
+	"github.com/gregjones/httpcache"
 )
 
 // Version is a constant that stores the Disgord version information.
@@ -22,9 +26,20 @@ const Version = "v0.0.0-alpha"
 // In this use case, there is no error that would be returned.
 var Session, _ = discordgo.New()
 
+var eve *esi.APIClient
+
 // Read in all configuration options from both environment variables and
 // command line arguments.
 func init() {
+
+	// Set up caching for esi http client (in-memory for now)
+	transport := httpcache.NewTransport(httpcache.NewMemoryCache())
+	transport.Transport = &http.Transport{Proxy: http.ProxyFromEnvironment}
+	client := &http.Client{Transport: transport}
+
+	// Get our API Client.
+	esiClient := goesi.NewAPIClient(client, "test app, edd_reynolds on slack")
+	eve = esiClient.ESI
 
 	// Discord Authentication Token
 	Session.Token = os.Getenv("DG_TOKEN")

@@ -1,3 +1,5 @@
 /.idea/
-fifth-bot.exe
-run.bat
+
+/fifth-bot*
+
+/run*
