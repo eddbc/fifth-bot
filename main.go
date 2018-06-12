@@ -1,25 +1,42 @@
+// Declare this file to be part of the main package so it can be compiled into
+// an executable.
 package main
 
+// Import all Go packages required for this file.
 import (
-	"fmt"
-	"github.com/bwmarrin/discordgo"
 	"flag"
+	"fmt"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"github.com/bwmarrin/discordgo"
 )
 
-// Version is a constant that stores the Fifth-Bot version information.
+// Version is a constant that stores the Disgord version information.
 const Version = "v0.0.0-alpha"
 
-var (
-	commandPrefix string
-	botID         string
-	token 		  string
-)
+// Session is declared in the global space so it can be easily used
+// throughout this program.
+// In this use case, there is no error that would be returned.
+var Session, _ = discordgo.New()
 
+// Read in all configuration options from both environment variables and
+// command line arguments.
 func init() {
-	flag.StringVar(&token, "t", "", "Discord Authentication Token")
+
+	// Discord Authentication Token
+	Session.Token = os.Getenv("DG_TOKEN")
+	if Session.Token == "" {
+		flag.StringVar(&Session.Token, "t", "", "Discord Authentication Token")
+	}
 }
 
 func main() {
+
+	// Declare any variables needed later.
+	var err error
 
 	// Print out a fancy logo!
 	fmt.Printf(` 
@@ -28,51 +45,38 @@ ___________.__  _____  __  .__   __________        __
  |    __)  |  \   __\\   __\  |  \|    |  _//  _ \   __\
  |     \   |  ||  |   |  | |   Y  \    |   (  <_> )  |  
  \___  /   |__||__|   |__| |___|  /______  /\____/|__|  
-     \/                         \/       \/             `+"\n\n")
+     \/                         \/       \/  %-16s`+"\n\n", Version)
 
+	// Parse command line arguments
 	flag.Parse()
 
-	discord, err := discordgo.New("Bot "+token)
-	errCheck("error creating discord session", err)
-	user, err := discord.User("@me")
-	errCheck("error retrieving account", err)
-
-	botID = user.ID
-	discord.AddHandler(commandHandler)
-	discord.AddHandler(func(discord *discordgo.Session, ready *discordgo.Ready) {
-		err = discord.UpdateStatus(0, "absolutely nothing.")
-		if err != nil {
-			fmt.Println("Error attempting to set my status")
-		}
-		servers := discord.State.Guilds
-		fmt.Printf("Fifth-Bot has started on %d servers", len(servers))
-	})
-
-	err = discord.Open()
-	errCheck("Error opening connection to Discord", err)
-	defer discord.Close()
-
-	commandPrefix = "!"
-
-	<-make(chan struct{})
-
-}
-
-func errCheck(msg string, err error) {
-	if err != nil {
-		fmt.Printf("%s: %+v", msg, err)
-		panic(err)
-	}
-}
-
-func commandHandler(discord *discordgo.Session, message *discordgo.MessageCreate) {
-	user := message.Author
-	if user.ID == botID || user.Bot {
-		//Do nothing because the bot is talking
+	// Verify a Token was provided
+	if Session.Token == "" {
+		log.Println("You must provide a Discord authentication token.")
 		return
 	}
 
-	//content := message.Content
+	// Verify the Token is valid and grab user information
+	Session.State.User, err = Session.User("@me")
+	if err != nil {
+		log.Printf("error fetching user information, %s\n", err)
+	}
 
-	fmt.Printf("Message: %+v || From: %s\n", message.Message, message.Author)
+	// Open a websocket connection to Discord
+	err = Session.Open()
+	if err != nil {
+		log.Printf("error opening connection to Discord, %s\n", err)
+		os.Exit(1)
+	}
+
+	// Wait for a CTRL-C
+	log.Printf(`Now running. Press CTRL-C to exit.`)
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	<-sc
+
+	// Clean up
+	Session.Close()
+
+	// Exit Normally.
 }
