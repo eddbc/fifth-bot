@@ -1,0 +1,1 @@
+go build && fifth-bot.exe
