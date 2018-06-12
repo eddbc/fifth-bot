@@ -23,6 +23,8 @@ import _ "github.com/joho/godotenv/autoload"
 // Version is a constant that stores the Disgord version information.
 const Version = "v0.0.0-alpha"
 
+const useragent = "fifth-bot, edd_reynolds on slack"
+
 // Session is declared in the global space so it can be easily used
 // throughout this program.
 // In this use case, there is no error that would be returned.
@@ -40,7 +42,7 @@ func init() {
 	client := &http.Client{Transport: transport}
 
 	// Get our API Client.
-	esiClient := goesi.NewAPIClient(client, "fifth-bot, edd_reynolds on slack")
+	esiClient := goesi.NewAPIClient(client, useragent)
 	eve = esiClient.ESI
 
 	// Discord Authentication Token

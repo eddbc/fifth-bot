@@ -60,6 +60,15 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error ) {
 		})
 	}
 
+	stats, e := zkillstats.get(cid)
+	if e == nil {
+		for _, st := range stats.TopAllTime {
+			if st.Type == "ship" {
+				log.Printf("%v", st.Data)
+			}
+		}
+	}
+
 	embed := &discordgo.MessageEmbed{
 		Author: &discordgo.MessageEmbedAuthor{},
 		Color:  0x00ff00, // Green
