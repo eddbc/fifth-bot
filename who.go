@@ -45,8 +45,6 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error ) {
 		},
 	}
 
-	//log.Printf("%#v\n", char)
-
 	if char.AllianceId != 0 {
 		alli, _, err := eve.AllianceApi.GetAlliancesAllianceId(context.Background(), char.AllianceId, nil)
 		if err != nil {

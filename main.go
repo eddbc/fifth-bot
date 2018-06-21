@@ -32,6 +32,8 @@ var Session, _ = discordgo.New()
 
 var eve *esi.APIClient
 
+var botChannel string
+
 // Read in all configuration options from both environment variables and
 // command line arguments.
 func init() {
@@ -44,6 +46,9 @@ func init() {
 	// Get our API Client.
 	esiClient := goesi.NewAPIClient(client, useragent)
 	eve = esiClient.ESI
+
+	// Get Default Bot Channel
+	botChannel = os.Getenv("FTH_BT_CHANNEL")
 
 	// Discord Authentication Token
 	Session.Token = os.Getenv("FTH_BT_TOKEN")
@@ -87,6 +92,9 @@ ___________.__  _____  __  .__   __________        __
 		log.Printf("error opening connection to Discord, %s\n", err)
 		os.Exit(1)
 	}
+
+	// Open ZKill websocket for new killmails
+	go listenZKill()
 
 	// Wait for a CTRL-C
 	log.Printf(`Now running. Press CTRL-C to exit.`)
