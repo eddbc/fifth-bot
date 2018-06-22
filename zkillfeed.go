@@ -100,6 +100,7 @@ func processKill(kill Kill) {
 	}
 
 	if interesting {
+		kill.inflate()
 		msg = fmt.Sprintf("%v %v", msg, kill.Zkb.url)
 		log.Println(msg)
 		for _, ch := range killPostChannels {
