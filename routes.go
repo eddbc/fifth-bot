@@ -23,6 +23,6 @@ func init() {
 	Router.Route("help", "Display this message", Router.Help)
 
 	Router.Route("status", "Get EVE Tranquility server status", f.status)
-	Router.Route("who", "Get info about an EVE character", f.who)
+	//Router.Route("who", "Get info about an EVE character", f.who)
 	Router.Route("time", "Get current EVE time, or time until a given EVE time (eg. ~time 20:00)", f.eveTime)
 }

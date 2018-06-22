@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"context"
 	"time"
+	"github.com/eddbc/fifth-bot/isk"
 )
 
 var entitiesOfInterest = []int{
@@ -17,8 +18,8 @@ var entitiesOfInterest = []int{
 }
 
 var killPostChannels = []string{
-	"459341365562572803",
-	"385195528360820739",
+	"459341365562572803", // test lab
+	"385195528360820739", // nogrl general
 }
 
 func listenZKill() {
@@ -71,10 +72,11 @@ func processKill(kill Kill) {
 		return
 	}
 
-	// look for expensive kills
+	// look for expensive kills (+10B)
 	if kill.Zkb.TotalValue > 10000000000 {
 		interesting = true
-		msg = "10B+ ship died"
+		kill.inflate()
+		msg =  fmt.Sprintf("Ship worth %v ISK died!", isk.NearestThousandFormat(kill.Zkb.TotalValue))
 	}
 
 	// look for entities of interest on the kill
@@ -89,13 +91,20 @@ func processKill(kill Kill) {
 			}
 			e := res[0]
 
-			msg = fmt.Sprintf("%v got a kill", e.Name)
+			killer := e.Name
+
+			fb, err := kill.getFinalBlow()
+			if err != nil {
+				killer = fb.CharacterName
+			}
+
+			msg = fmt.Sprintf("%v managed to kill something. Good Job.", killer)
 		}
 
 		if kill.isVictim(id){
 			interesting = true
 			kill.inflate()
-			msg = fmt.Sprintf("%v is a disgusting feeder", kill.Victim.CharacterName)
+			msg = fmt.Sprintf("%v is a disgusting feeder.", kill.Victim.CharacterName)
 		}
 	}
 

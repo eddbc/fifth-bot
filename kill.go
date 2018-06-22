@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"context"
 	"log"
+	"errors"
 )
 
 
@@ -23,16 +24,25 @@ func (k *Kill) inflate() {
 
 		ctx := context.Background()
 
+		// get victim ship
+		ship, _, err := eve.UniverseApi.GetUniverseTypesTypeId(ctx, int32(k.Victim.ShipTypeID), nil)
+		if err == nil {
+			k.Victim.ShipTypeName = ship.Name
+		} else {log.Printf("inflate victim ship: %v", err)}
+
+		// get victim character
 		vic, _, err := eve.CharacterApi.GetCharactersCharacterId(ctx, int32(k.Victim.CharacterID), nil)
 		if err == nil {
 			k.Victim.CharacterName = vic.Name
 		} else {log.Printf("inflate character: %v", err)}
 
+		// get victim corp
 		crp, _, err := eve.CorporationApi.GetCorporationsCorporationId(ctx, int32(k.Victim.CorporationID), nil)
 		if err == nil {
 			k.Victim.CorporationName = crp.Name
 		} else {log.Printf("inflate corp: %v", err)}
 
+		// get victim alliance
 		ali, _, err := eve.AllianceApi.GetAlliancesAllianceId(ctx, int32(k.Victim.AllianceID), nil)
 		if err == nil {
 			k.Victim.AllianceName = ali.Name
@@ -40,6 +50,20 @@ func (k *Kill) inflate() {
 
 		k.inflated = true
 	}
+}
+
+func (k *Kill) getFinalBlow() (Attacker, error) {
+	for _, at := range k.Attackers {
+		if at.FinalBlow {
+			fb, _, err := eve.CharacterApi.GetCharactersCharacterId(context.Background(), int32(at.CharacterID), nil)
+			if err == nil {
+				at.CharacterName = fb.Name
+				return at, nil
+			} else {log.Printf("inflate final blow character: %v", err)}
+		}
+	}
+
+	return Attacker{}, errors.New("error occurred getting final blow character")
 }
 
 /*
