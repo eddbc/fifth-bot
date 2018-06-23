@@ -77,8 +77,8 @@ func processKill(kill Kill) {
 		return
 	}
 
-	// look for expensive kills (+10B)
-	if kill.Zkb.TotalValue > 10000000000 {
+	// look for expensive kills (+15B)
+	if kill.Zkb.TotalValue > 15000000000 {
 		interesting = true
 		kill.inflate()
 		msg =  fmt.Sprintf("%v worth %v ISK died!", kill.Victim.ShipTypeName, isk.NearestThousandFormat(kill.Zkb.TotalValue))
