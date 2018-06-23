@@ -98,7 +98,7 @@ func processKill(kill Kill) {
 				killer = fb.CharacterName
 			}
 
-			msg = fmt.Sprintf("%v managed to kill something. Good Job.", killer)
+			msg = fmt.Sprintf("%v managed to kill something. Good job, I guess.", killer)
 		}
 
 		if kill.isVictim(id){
