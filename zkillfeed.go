@@ -81,7 +81,6 @@ func processKill(kill Kill) {
 	if !isKill && !isLoss {
 		sys, _, err := eve.UniverseApi.GetUniverseSystemsSystemId(context.Background(), int32(kill.SolarSystemID), nil)
 		if err == nil {
-			log.Printf("system security for %v: %v",sys.Name, sys.SecurityStatus)
 			if sys.SecurityStatus >= 0.5 {
 				return
 			}
