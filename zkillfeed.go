@@ -52,6 +52,10 @@ func listenZKill() {
 	<-done
 }
 
+func logIgnore(reason string) {
+	log.Printf("ignoring kill. reason: %v\n", reason)
+}
+
 func processKill(kill Kill) {
 
 	important := false
@@ -60,16 +64,19 @@ func processKill(kill Kill) {
 
 	// ignore all kills under 1M, to reduce spam
 	if value < 1000000 {
+		logIgnore("<1M ISK")
 		return
 	}
 
 	// ignore kills more that 24 hours old
 	if kill.KillmailTime.Before( time.Now().Add(-1*(24*time.Hour)) ) {
+		logIgnore("too old")
 		return
 	}
 
 	// ignore structures, maybe?
 	if kill.Victim.CharacterID == 0 {
+		logIgnore("no victim character")
 		return
 	}
 
@@ -82,6 +89,7 @@ func processKill(kill Kill) {
 		sys, _, err := eve.UniverseApi.GetUniverseSystemsSystemId(context.Background(), int32(kill.SolarSystemID), nil)
 		if err == nil {
 			if sys.SecurityStatus >= 0.5 {
+				logIgnore("high-sec")
 				return
 			}
 		} else {
@@ -93,6 +101,7 @@ func processKill(kill Kill) {
 	if isExpsv || isKill || isLoss {
 		kill.inflate()
 	} else {
+		logIgnore("doesn't match criteria")
 		return
 	}
 
