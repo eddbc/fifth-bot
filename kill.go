@@ -164,12 +164,12 @@ type Attacker struct {
 }
 
 type Character struct {
-	AllianceID     	int     `json:"alliance_id"`
+	AllianceID     	int     `json:"alliance_id,omitempty"`
 	AllianceName   	string
-	CharacterID    	int     `json:"character_id"`
+	CharacterID    	int     `json:"character_id,omitempty"`
 	CharacterName  	string
-	CorporationID  	int     `json:"corporation_id"`
+	CorporationID  	int     `json:"corporation_id,omitempty"`
 	CorporationName	string
-	ShipTypeID     	int     `json:"ship_type_id"`
+	ShipTypeID     	int     `json:"ship_type_id,omitempty"`
 	ShipTypeName	string
 }

@@ -25,6 +25,12 @@ const Version = "v0.0.0-alpha"
 
 const useragent = "fifth-bot, edd_reynolds on slack"
 
+var debug = false
+
+var debugChannel = "459341365562572803" // testing-lab
+var spamChannel = "459997163787649025" // pit of dispair
+var importantChannel = "385195528360820739" // general
+
 // Session is declared in the global space so it can be easily used
 // throughout this program.
 // In this use case, there is no error that would be returned.
@@ -55,6 +61,8 @@ func init() {
 	if Session.Token == "" {
 		flag.StringVar(&Session.Token, "t", "", "Discord Authentication Token")
 	}
+
+	flag.BoolVar(&debug, "d", false, "Debug Mode")
 }
 
 func main() {
@@ -73,6 +81,10 @@ ___________.__  _____  __  .__   __________        __
 
 	// Parse command line arguments
 	flag.Parse()
+
+	if debug {
+		log.Println("debug enabled")
+	}
 
 	// Verify a Token was provided
 	if Session.Token == "" {
@@ -106,4 +118,20 @@ ___________.__  _____  __  .__   __________        __
 	Session.Close()
 
 	// Exit Normally.
+}
+
+func sendMsg(msg string) {
+	sendMsgToChan(spamChannel, msg)
+}
+
+func sendImportantMsg(msg string) {
+	sendMsgToChan(importantChannel, msg)
+}
+
+func sendMsgToChan(chann string, msg string) {
+	log.Println(msg)
+	Session.ChannelMessageSend(debugChannel, msg)
+	if !debug {
+		Session.ChannelMessageSend(chann, msg)
+	}
 }

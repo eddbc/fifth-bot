@@ -1,3 +1,3 @@
 if go build ; then
-    ./fifth-bot
+    ./fifth-bot -d
 fi

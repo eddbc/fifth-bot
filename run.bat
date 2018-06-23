@@ -1,1 +1,1 @@
-go build && fifth-bot.exe
+go build && fifth-bot.exe -d

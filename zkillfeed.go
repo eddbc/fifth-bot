@@ -4,22 +4,17 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"fmt"
-	"context"
 	"time"
 	"github.com/eddbc/fifth-bot/isk"
+	"context"
 )
 
 var entitiesOfInterest = []int{
-	//1354830081, // goons
-	//99005338,	// horde
+	1354830081, // goons
+	99005338,	// horde
 	//99008312, 	// escl8
 	//99006411, 	// nsh
 	98481691, 	// nogrl
-}
-
-var killPostChannels = []string{
-	"459341365562572803", // test lab
-	"459997163787649025", // nogrl bot spam
 }
 
 func listenZKill() {
@@ -59,11 +54,12 @@ func listenZKill() {
 
 func processKill(kill Kill) {
 
-	interesting := false
+	important := false
 	msg := ""
+	value := kill.Zkb.TotalValue
 
 	// ignore all kills under 1M, to reduce spam
-	if kill.Zkb.TotalValue < 1000000 {
+	if value < 1000000 {
 		return
 	}
 
@@ -77,50 +73,84 @@ func processKill(kill Kill) {
 		return
 	}
 
-	// look for expensive kills (+15B)
-	if kill.Zkb.TotalValue > 15000000000 {
-		interesting = true
+	// get filtering criteria
+	isExpsv := isExpensive(kill)
+	isKill, isLoss := isEntityRelated(kill)
+
+	// ignore unrelated kills in highsec
+	if !isKill && !isLoss {
+		sys, _, err := eve.UniverseApi.GetUniverseSystemsSystemId(context.Background(), int32(kill.SolarSystemID), nil)
+		if err == nil {
+			log.Printf("system security for %v: %v",sys.Name, sys.SecurityStatus)
+			if sys.SecurityStatus >= 0.5 {
+				return
+			}
+		} else {
+			log.Printf("error getting system: %v", err)
+		}
+	}
+
+	// get kill details if matches any criteria, exit if not
+	if isExpsv || isKill || isLoss {
 		kill.inflate()
+	} else {
+		return
+	}
+
+	if isLoss { // ship lost by entity of interest
+		msg = fmt.Sprintf("%v is a disgusting feeder", kill.Victim.CharacterName)
+	} else if isKill { // ship killed by entity of interest
+		fnlBlw, err := kill.getFinalBlow()
+		if err != nil {
+			fnlBlw.CharacterName = "Someone"
+		}
+
+		switch  {
+		case value <=3000000: // Sub 3M kills
+			msg = fmt.Sprintf("%v is kb padding. Disgusting.", fnlBlw.CharacterName)
+			break
+		case value <= 1000000000: // 3M - 1B kills
+			msg = fmt.Sprintf("%v isn't completely useless.", fnlBlw.CharacterName)
+			break
+		default: // 1B+ kills
+			msg = fmt.Sprintf("%v killed something big. Good job team.", fnlBlw.CharacterName)
+			important = true
+		}
+	} else if isExpsv { // kill is expensive
 		msg =  fmt.Sprintf("%v worth %v ISK died!", kill.Victim.ShipTypeName, isk.NearestThousandFormat(kill.Zkb.TotalValue))
 	}
 
-	// look for entities of interest on the kill
-	for _, id := range entitiesOfInterest {
-		if kill.isAttacker(id){
-			interesting = true
-			kill.inflate()
-			list := []int32{int32(id)}
-			res, _, err := eve.UniverseApi.PostUniverseNames(context.Background(), list, nil)
-			if err != nil {
-				log.Fatal("entity lookup:", err)
-			}
-			e := res[0]
-
-			killer := e.Name
-
-			fb, err := kill.getFinalBlow()
-			if err != nil {
-				killer = fb.CharacterName
-			}
-
-			msg = fmt.Sprintf("%v managed to kill something. Good job, I guess.", killer)
-		}
-
-		if kill.isVictim(id){
-			interesting = true
-			kill.inflate()
-			msg = fmt.Sprintf("%v is a disgusting feeder.", kill.Victim.CharacterName)
-		}
-	}
-
-	if interesting {
-		kill.inflate()
+	// put zKill link in message
+	if msg == "" {
+		msg = kill.Zkb.url
+	} else {
 		msg = fmt.Sprintf("%v %v", msg, kill.Zkb.url)
-		log.Println(msg)
-		for _, ch := range killPostChannels {
-			Session.ChannelMessageSend(ch, msg)
-		}
 	}
+
+	// send message to appropriate channels
+	if important {
+		sendImportantMsg(msg)
+	} else {
+		sendMsg(msg)
+	}
+
+}
+
+func isExpensive(km Kill) (bool){
+	expsvLimit := float64(15000000000)
+	return km.Zkb.TotalValue > expsvLimit
+}
+
+func isEntityRelated(km Kill) (bool, bool) {
+	loss := false
+	kill := false
+
+	for _, id := range entitiesOfInterest {
+		kill = km.isAttacker(id)
+		loss = km.isVictim(id)
+	}
+
+	return kill, loss
 }
 
 type subscribe struct {
