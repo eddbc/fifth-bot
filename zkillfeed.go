@@ -19,7 +19,7 @@ var entitiesOfInterest = []int{
 
 var killPostChannels = []string{
 	"459341365562572803", // test lab
-	"385195528360820739", // nogrl general
+	"459997163787649025", // nogrl bot spam
 }
 
 func listenZKill() {
@@ -76,7 +76,7 @@ func processKill(kill Kill) {
 	if kill.Zkb.TotalValue > 10000000000 {
 		interesting = true
 		kill.inflate()
-		msg =  fmt.Sprintf("Ship worth %v ISK died!", isk.NearestThousandFormat(kill.Zkb.TotalValue))
+		msg =  fmt.Sprintf("%v worth %v ISK died!", kill.Victim.ShipTypeName, isk.NearestThousandFormat(kill.Zkb.TotalValue))
 	}
 
 	// look for entities of interest on the kill
