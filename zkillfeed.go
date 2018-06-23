@@ -72,6 +72,11 @@ func processKill(kill Kill) {
 		return
 	}
 
+	// ignore structures, maybe?
+	if kill.Victim.CharacterID == 0 {
+		return
+	}
+
 	// look for expensive kills (+10B)
 	if kill.Zkb.TotalValue > 10000000000 {
 		interesting = true
