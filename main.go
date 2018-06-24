@@ -128,10 +128,15 @@ func sendImportantMsg(msg string) {
 	sendMsgToChan(importantChannel, msg)
 }
 
+func sendDebugMsg(msg string) {
+	Session.ChannelMessageSend(debugChannel, msg)
+}
+
 func sendMsgToChan(chann string, msg string) {
 	log.Println(msg)
-	Session.ChannelMessageSend(debugChannel, msg)
 	if !debug {
 		Session.ChannelMessageSend(chann, msg)
+	} else {
+		Session.ChannelMessageSend(debugChannel, msg)
 	}
 }

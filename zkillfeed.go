@@ -7,6 +7,7 @@ import (
 	"time"
 	"github.com/eddbc/fifth-bot/isk"
 	"context"
+	"errors"
 )
 
 var entitiesOfInterest = []int{
@@ -84,7 +85,10 @@ func processKill(kill Kill) {
 
 	// get filtering criteria
 	isExpsv := isExpensive(kill)
-	isKill, isLoss := isEntityRelated(kill)
+	isKill, isLoss, err := isEntityRelated(kill)
+	if err != nil {
+		return
+	}
 
 	// ignore unrelated kills in highsec
 	if !isKill && !isLoss {
@@ -149,16 +153,24 @@ func isExpensive(km Kill) (bool){
 	return km.Zkb.TotalValue > expsvLimit
 }
 
-func isEntityRelated(km Kill) (bool, bool) {
-	loss := false
-	kill := false
+func isEntityRelated(km Kill) (kill bool, loss bool, err error) {
+	kill = false
+	loss = false
+
+	defer func() {
+		if r := recover(); r != nil {
+			err = errors.New("error getting related information")
+			log.Printf("error getting related information for kill %v: %v+", km.KillmailID, r)
+			sendDebugMsg(fmt.Sprintf("error: crashing because of this kill: %v %v", km.KillmailID, km.Zkb.url))
+		}
+	}()
 
 	for _, id := range entitiesOfInterest {
 		kill = km.isAttacker(id)
 		loss = km.isVictim(id)
 	}
 
-	return kill, loss
+	return kill, loss, nil
 }
 
 type subscribe struct {
