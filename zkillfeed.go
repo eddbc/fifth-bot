@@ -53,7 +53,9 @@ func listenZKill() {
 }
 
 func logIgnore(reason string) {
-	log.Printf("ignoring kill. reason: %v\n", reason)
+	if debug {
+		log.Printf("ignoring kill. reason: %v\n", reason)
+	}
 }
 
 func processKill(kill Kill) {
@@ -62,9 +64,9 @@ func processKill(kill Kill) {
 	msg := ""
 	value := kill.Zkb.TotalValue
 
-	// ignore all kills under 1M, to reduce spam
-	if value < 1000000 {
-		logIgnore("<1M ISK")
+	// ignore all kills under 5M, to reduce spam
+	if value < 5000000 {
+		logIgnore("<5M ISK")
 		return
 	}
 
@@ -113,16 +115,14 @@ func processKill(kill Kill) {
 			fnlBlw.CharacterName = "Someone"
 		}
 
-		switch  {
-		case value <=3000000: // Sub 3M kills
-			msg = fmt.Sprintf("%v is kb padding. Disgusting.", fnlBlw.CharacterName)
-			break
-		case value <= 1000000000: // 3M - 1B kills
-			msg = fmt.Sprintf("%v isn't completely useless.", fnlBlw.CharacterName)
-			break
-		default: // 1B+ kills
+
+		if value >= 1000000000 {
+			// 1B+ kills are important
 			msg = fmt.Sprintf("%v killed something big. Good job team.", fnlBlw.CharacterName)
 			important = true
+		} else {
+			// <1B kills are not important
+			msg = fmt.Sprintf("%v isn't completely useless.", fnlBlw.CharacterName)
 		}
 	} else if isExpsv { // kill is expensive
 		msg =  fmt.Sprintf("%v worth %v ISK died!", kill.Victim.ShipTypeName, isk.NearestThousandFormat(kill.Zkb.TotalValue))
