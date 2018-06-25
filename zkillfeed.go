@@ -11,8 +11,8 @@ import (
 )
 
 var entitiesOfInterest = []int{
-	1354830081, // goons
-	99005338,	// horde
+	//1354830081, // goons
+	//99005338,	// horde
 	//99008312, 	// escl8
 	//99006411, 	// nsh
 	98481691, 	// nogrl
@@ -43,8 +43,7 @@ func listenZKill() {
 			kill := Kill{}
 			err := c.ReadJSON(&kill)
 			if err != nil {
-				log.Println("read:", err)
-				return
+				log.Fatal("websocket read: ", err)
 			}
 			processKill(kill)
 		}
