@@ -111,7 +111,10 @@ func processKill(kill Kill) {
 	}
 
 	if isLoss { // ship lost by entity of interest
-		msg = fmt.Sprintf("%v is a disgusting feeder", kill.Victim.CharacterName)
+		msg = fmt.Sprintf("%v is a disgusting feeder :rip:", kill.Victim.CharacterName)
+		if value > 500000000 {
+			important = true
+		}
 	} else if isKill { // ship killed by entity of interest
 		fnlBlw, err := kill.getFinalBlow()
 		if err != nil {
