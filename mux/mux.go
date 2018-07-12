@@ -124,12 +124,12 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 		// Try fetching via REST API
 		c, err = ds.Channel(mc.ChannelID)
 		if err != nil {
-			log.Printf("unable to fetch Channel for Message,", err)
+			log.Printf("unable to fetch Channel for Message, %v", err)
 		} else {
 			// Attempt to add this channel into our State
 			err = ds.State.ChannelAdd(c)
 			if err != nil {
-				log.Printf("error updating State with Channel,", err)
+				log.Printf("error updating State with Channel, %v", err)
 			}
 			// Add Channel info into Context
 			ctx.GuildID = c.GuildID
