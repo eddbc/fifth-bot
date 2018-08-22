@@ -52,7 +52,7 @@ func listenZKill() {
 
 func logIgnore(reason string) {
 	if debug {
-		//log.Printf("ignoring kill. reason: %v\n", reason)
+		log.Printf("ignoring kill. reason: %v\n", reason)
 	}
 }
 
@@ -63,10 +63,10 @@ func processKill(kill Kill) {
 	value := kill.Zkb.TotalValue
 
 	// ignore all kills under 5M, to reduce spam
-	if value < 5000000 {
-		logIgnore("<5M ISK")
-		return
-	}
+	//if value < 5000000 {
+	//	logIgnore("<5M ISK")
+	//	return
+	//}
 
 	// ignore kills more that 24 hours old
 	if kill.KillmailTime.Before(time.Now().Add(-1 * (24 * time.Hour))) {
@@ -107,6 +107,8 @@ func processKill(kill Kill) {
 		logIgnore("doesn't match criteria")
 		return
 	}
+
+	log.Printf("got here with kill %v\n", kill.KillmailID)
 
 	if isLoss { // ship lost by entity of interest
 		msg = fmt.Sprintf("%v is a disgusting feeder", kill.Victim.CharacterName)
@@ -162,8 +164,8 @@ func isEntityRelated(km Kill) (kill bool, loss bool, err error) {
 	}()
 
 	for _, id := range entitiesOfInterest {
-		kill = km.isAttacker(id)
-		loss = km.isVictim(id)
+		kill = kill || km.isAttacker(id)
+		loss = loss || km.isVictim(id)
 	}
 
 	return kill, loss, nil

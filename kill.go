@@ -150,17 +150,18 @@ func (k *Kill) isAttacker(entityId int) (bool) {
 Check if an entity (character, corp or alliance) was the victim in a kill
  */
 func (k *Kill) isVictim(entityId int) (bool) {
+	loss := false
 	if k.Victim.CharacterID == entityId {
-		return true
+		loss = true
 	}
 	if k.Victim.CorporationID == entityId {
-		return true
+		loss = true
 	}
 	if k.Victim.AllianceID == entityId {
-		return true
+		loss = true
 	}
 
-	return false
+	return loss
 }
 
 //
