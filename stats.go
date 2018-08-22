@@ -1,26 +1,26 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
-	"fmt"
-	"log"
-	"io/ioutil"
-	"encoding/json"
 )
 
 var zkillstats ZKillCharStats
 
 type ZKillCharStats struct {
 	client http.Client
-	url string
+	url    string
 }
 
 func init() {
 	client := http.Client{
 		Timeout: time.Second * 5, // Maximum of 5 secs
 	}
-	zkillstats = ZKillCharStats{client:client, url:"https://zkillboard.com/api/stats/characterID/%d/"}
+	zkillstats = ZKillCharStats{client: client, url: "https://zkillboard.com/api/stats/characterID/%d/"}
 }
 
 func (z ZKillCharStats) get(id int32) (*ZKillCharacterStatsResp, error) {
@@ -34,7 +34,7 @@ func (z ZKillCharStats) get(id int32) (*ZKillCharacterStatsResp, error) {
 	}
 
 	body, _ := ioutil.ReadAll(res.Body)
-	stats:=ZKillCharacterStatsResp{}
+	stats := ZKillCharacterStatsResp{}
 	jsonErr := json.Unmarshal(body, &stats)
 	if jsonErr != nil {
 		log.Printf("Error! %s\n", jsonErr)

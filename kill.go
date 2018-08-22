@@ -6,12 +6,17 @@ import (
 	"context"
 	"log"
 	"errors"
+	"sort"
 )
 
 
 //
 // Methods
 //
+
+func (k *Kill) getUrl() string {
+	return fmt.Sprintf("https://zkillboard.com/kill/%v/", k.KillmailID)
+}
 
 /*
 Get related data from provided IDs
@@ -39,17 +44,31 @@ func (k *Kill) inflate() {
 		// get victim corp
 		crp, _, err := eve.CorporationApi.GetCorporationsCorporationId(ctx, int32(k.Victim.CorporationID), nil)
 		if err == nil {
-			k.Victim.CorporationName = crp.Name
+			k.Victim.CorporationName   = crp.Name
+			k.Victim.CorporationTicker = crp.Ticker
 		} else {log.Printf("inflate corp: %v", err)}
 
 		// get victim alliance
 		ali, _, err := eve.AllianceApi.GetAlliancesAllianceId(ctx, int32(k.Victim.AllianceID), nil)
 		if err == nil {
-			k.Victim.AllianceName = ali.Name
+			k.Victim.AllianceName   = ali.Name
+			k.Victim.AllianceTicker = ali.Ticker
 		} else {log.Printf("inflate alliance: %v", err)}
 
 		k.inflated = true
 	}
+}
+
+func (s byDamage) Len () int {
+	return len(s)
+}
+
+func (s byDamage) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s byDamage) Less(i, j int) bool {
+	return s[i].DamageDone < s[j].DamageDone
 }
 
 func (k *Kill) getFinalBlow() (Attacker, error) {
@@ -66,6 +85,28 @@ func (k *Kill) getFinalBlow() (Attacker, error) {
 	return Attacker{}, errors.New("error occurred getting final blow character")
 }
 
+func (k *Kill) interestingName() (string, error) {
+	name := "Someone"
+
+	fnlBlw, err := k.getFinalBlow()
+	if err == nil {
+		name = fnlBlw.CharacterName
+	}
+
+	if k.InterestingAttackers != nil {
+		atkrs := k.InterestingAttackers
+		sort.Sort(byDamage(atkrs))
+		for _, atk := range atkrs {
+			a, _, err := eve.CharacterApi.GetCharactersCharacterId(context.Background(), int32(atk.CharacterID), nil)
+			if err == nil {
+				name = a.Name
+			}
+		}
+	}
+
+	return name, err
+}
+
 /*
 Check if an entity (character, corp or alliance) was involved in a kill
  */
@@ -77,18 +118,32 @@ func (k *Kill) involved(entityId int) (bool) {
 Check if an entity (character, corp or alliance) was an attacker in a kill
  */
 func (k *Kill) isAttacker(entityId int) (bool) {
+
+	k.InterestingAttackers = nil
+
 	for _, a := range k.Attackers {
+		r := false
+
 		if a.CharacterID == entityId {
-			return true
+			r = true
 		}
 		if a.CorporationID == entityId {
-			return true
+			r = true
 		}
 		if a.AllianceID == entityId {
-			return true
+			r = true
+		}
+
+		if r {
+			if k.InterestingAttackers == nil {
+				k.InterestingAttackers = []Attacker{a}
+			} else {
+				k.InterestingAttackers = append(k.InterestingAttackers, a)
+			}
 		}
 	}
-	return false
+
+	return k.InterestingAttackers != nil
 }
 
 /*
@@ -112,8 +167,11 @@ func (k *Kill) isVictim(entityId int) (bool) {
 // Structs
 //
 
+type byDamage []Attacker
+
 type Kill struct {
 	Attackers []Attacker 	`json:"attackers"`
+	InterestingAttackers []Attacker
 	KillmailID    int       `json:"killmail_id"`
 	KillmailTime  time.Time `json:"killmail_time"`
 	SolarSystemID int       `json:"solar_system_id"`
@@ -164,12 +222,17 @@ type Attacker struct {
 }
 
 type Character struct {
-	AllianceID     	int     `json:"alliance_id,omitempty"`
-	AllianceName   	string
-	CharacterID    	int     `json:"character_id,omitempty"`
-	CharacterName  	string
-	CorporationID  	int     `json:"corporation_id,omitempty"`
-	CorporationName	string
-	ShipTypeID     	int     `json:"ship_type_id,omitempty"`
-	ShipTypeName	string
+	AllianceID     	  int     `json:"alliance_id,omitempty"`
+	AllianceName   	  string
+	AllianceTicker    string
+
+	CorporationID  	  int     `json:"corporation_id,omitempty"`
+	CorporationName	  string
+	CorporationTicker string
+
+	CharacterID    	  int     `json:"character_id,omitempty"`
+	CharacterName  	  string
+
+	ShipTypeID     	  int     `json:"ship_type_id,omitempty"`
+	ShipTypeName	  string
 }

@@ -7,14 +7,14 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
-	"net/http"
 	"syscall"
 
-	"github.com/bwmarrin/discordgo"
 	"github.com/antihax/goesi"
 	"github.com/antihax/goesi/esi"
+	"github.com/bwmarrin/discordgo"
 	"github.com/gregjones/httpcache"
 )
 
@@ -27,8 +27,8 @@ const useragent = "fifth-bot, edd_reynolds on slack"
 
 var debug = false
 
-var debugChannel = "459341365562572803" // testing-lab
-var spamChannel = "459997163787649025" // pit of dispair
+var debugChannel = "459341365562572803"     // testing-lab
+var spamChannel = "459997163787649025"      // pit of dispair
 var importantChannel = "385195528360820739" // general
 
 // Session is declared in the global space so it can be easily used

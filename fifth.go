@@ -1,15 +1,15 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/eddbc/fifth-bot/mux"
 	"log"
-	"context"
-	"fmt"
 	"time"
 )
 
-type Fifth struct {}
+type Fifth struct{}
 
 func (f *Fifth) status(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 
@@ -32,7 +32,7 @@ func (f *Fifth) status(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Co
 	}
 }
 
-func (f *Fifth) eveTime (ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
+func (f *Fifth) eveTime(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 
 	//init the loc
 	loc, _ := time.LoadLocation("Atlantic/Reykjavik")
@@ -46,7 +46,7 @@ func (f *Fifth) eveTime (ds *discordgo.Session, dm *discordgo.Message, ctx *mux.
 		tt := ctx.Fields[1]
 		target, _ := time.ParseInLocation("2006/01/02 15:04", fmt.Sprintf("%v %v", dd, tt), loc)
 		if target.Before(et) {
-			target = target.AddDate(0,0,1)
+			target = target.AddDate(0, 0, 1)
 		}
 
 		log.Printf("target time %v for input %v", target, ctx.Fields[1])
@@ -70,16 +70,16 @@ func (f *Fifth) who(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Conte
 
 	for k, v := range ctx.Fields {
 		if k != 0 {
-			name+=v
-			if k<len(ctx.Fields) {
-				name+=" "
+			name += v
+			if k < len(ctx.Fields) {
+				name += " "
 			}
 		}
 	}
 
 	embed, err := getCharacterInfoEmbed(name)
 
-	if err == nil{
+	if err == nil {
 		ds.ChannelMessageSendEmbed(dm.ChannelID, embed)
 	} else {
 		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Error :warning: %s\n", err))

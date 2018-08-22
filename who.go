@@ -1,19 +1,19 @@
 package main
 
 import (
-	"github.com/antihax/goesi/esi"
-	"github.com/antihax/goesi/optional"
-	"log"
-	"github.com/bwmarrin/discordgo"
-	"fmt"
 	"context"
 	"errors"
+	"fmt"
+	"github.com/antihax/goesi/esi"
+	"github.com/antihax/goesi/optional"
+	"github.com/bwmarrin/discordgo"
+	"log"
 )
 
-func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error ) {
+func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 
 	res, _, err := eve.SearchApi.GetSearch(context.Background(), []string{"character"}, name, &esi.GetSearchOpts{
-		Strict:optional.NewBool(true),
+		Strict: optional.NewBool(true),
 	})
 	if err != nil {
 		log.Printf("error getting character id, %s\n", err)
@@ -72,10 +72,10 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error ) {
 		Color:  0x00ff00, // Green
 		Fields: fields,
 		Thumbnail: &discordgo.MessageEmbedThumbnail{
-			URL:  fmt.Sprintf("https://imageserver.eveonline.com/Character/%d_128.jpg",cid),
+			URL: fmt.Sprintf("https://imageserver.eveonline.com/Character/%d_128.jpg", cid),
 		},
 		//Timestamp: time.Now().Format(time.RFC3339), // Discord wants ISO8601; RFC3339 is an extension of ISO8601 and should be completely compatible.
-		Title:     char.Name,
+		Title: char.Name,
 	}
 
 	return embed, nil

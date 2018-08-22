@@ -1,21 +1,19 @@
 package main
 
 import (
-	"github.com/gorilla/websocket"
-	"log"
-	"fmt"
-	"time"
-	"github.com/eddbc/fifth-bot/isk"
 	"context"
 	"errors"
+	"fmt"
+	"github.com/eddbc/fifth-bot/isk"
+	"github.com/gorilla/websocket"
+	"log"
+	"time"
 )
 
 var entitiesOfInterest = []int{
-	//1354830081, // goons
-	//99005338,	// horde
-	//99008312, 	// escl8
-	//99006411, 	// nsh
-	98481691, 	// nogrl
+	1354830081, // goons
+	99005338,	// horde
+	98481691, // nogrl
 }
 
 func listenZKill() {
@@ -54,7 +52,7 @@ func listenZKill() {
 
 func logIgnore(reason string) {
 	if debug {
-		log.Printf("ignoring kill. reason: %v\n", reason)
+		//log.Printf("ignoring kill. reason: %v\n", reason)
 	}
 }
 
@@ -71,7 +69,7 @@ func processKill(kill Kill) {
 	}
 
 	// ignore kills more that 24 hours old
-	if kill.KillmailTime.Before( time.Now().Add(-1*(24*time.Hour)) ) {
+	if kill.KillmailTime.Before(time.Now().Add(-1 * (24 * time.Hour))) {
 		logIgnore("too old")
 		return
 	}
@@ -111,34 +109,30 @@ func processKill(kill Kill) {
 	}
 
 	if isLoss { // ship lost by entity of interest
-		msg = fmt.Sprintf("%v is a disgusting feeder :rip:", kill.Victim.CharacterName)
+		msg = fmt.Sprintf("%v is a disgusting feeder", kill.Victim.CharacterName)
 		if value > 500000000 {
 			important = true
 		}
 	} else if isKill { // ship killed by entity of interest
-		fnlBlw, err := kill.getFinalBlow()
-		if err != nil {
-			fnlBlw.CharacterName = "Someone"
-		}
-
+		name, _ := kill.interestingName()
 
 		if value >= 1000000000 {
 			// 1B+ kills are important
-			msg = fmt.Sprintf("%v killed something big. Good job team.", fnlBlw.CharacterName)
+			msg = fmt.Sprintf("%v killed something big. Good job team.", name)
 			important = true
 		} else {
 			// <1B kills are not important
-			msg = fmt.Sprintf("%v isn't completely useless.", fnlBlw.CharacterName)
+			msg = fmt.Sprintf("%v isn't completely useless.", name)
 		}
 	} else if isExpsv { // kill is expensive
-		msg =  fmt.Sprintf("%v worth %v ISK died!", kill.Victim.ShipTypeName, isk.NearestThousandFormat(kill.Zkb.TotalValue))
+		msg = fmt.Sprintf("%v worth %v ISK died!", kill.Victim.ShipTypeName, isk.NearestThousandFormat(kill.Zkb.TotalValue))
 	}
 
 	// put zKill link in message
 	if msg == "" {
 		msg = kill.Zkb.url
 	} else {
-		msg = fmt.Sprintf("%v %v", msg, kill.Zkb.url)
+		msg = fmt.Sprintf("%v <%v>", msg, kill.Zkb.url)
 	}
 
 	// send message to appropriate channels
@@ -150,7 +144,7 @@ func processKill(kill Kill) {
 
 }
 
-func isExpensive(km Kill) (bool){
+func isExpensive(km Kill) bool {
 	expsvLimit := float64(15000000000)
 	return km.Zkb.TotalValue > expsvLimit
 }
@@ -163,7 +157,7 @@ func isEntityRelated(km Kill) (kill bool, loss bool, err error) {
 		if r := recover(); r != nil {
 			err = errors.New("error getting related information")
 			log.Printf("error getting related information for kill %v: %v+", km.KillmailID, r)
-			sendDebugMsg(fmt.Sprintf("error: crashing because of this kill: %v %v", km.KillmailID, km.Zkb.url))
+			sendDebugMsg(fmt.Sprintf("error: crashing because of this kill: %v", km.getUrl()))
 		}
 	}()
 

@@ -1,9 +1,9 @@
 package isk
 
 import (
-"math"
-"strconv"
-"strings"
+	"math"
+	"strconv"
+	"strings"
 )
 
 // credit to https://github.com/DeyV/gotools/blob/master/numbers.go
