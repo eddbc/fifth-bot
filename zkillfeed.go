@@ -11,8 +11,8 @@ import (
 )
 
 var entitiesOfInterest = []int{
-	1354830081, // goons
-	99005338,	// horde
+	//1354830081, // goons
+	//99005338,	// horde
 	98481691, // nogrl
 }
 
@@ -107,8 +107,6 @@ func processKill(kill Kill) {
 		logIgnore("doesn't match criteria")
 		return
 	}
-
-	log.Printf("got here with kill %v\n", kill.KillmailID)
 
 	if isLoss { // ship lost by entity of interest
 		msg = fmt.Sprintf("%v is a disgusting feeder", kill.Victim.CharacterName)

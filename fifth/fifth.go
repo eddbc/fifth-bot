@@ -1,4 +1,4 @@
-package main
+package fifth
 
 import (
 	"context"
@@ -7,13 +7,17 @@ import (
 	"github.com/eddbc/fifth-bot/mux"
 	"log"
 	"time"
+	"github.com/antihax/goesi/esi"
 )
+
+var Eve *esi.APIClient
+const useragent = "fifth-bot, edd_reynolds on slack"
 
 type Fifth struct{}
 
-func (f *Fifth) status(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
+func (f *Fifth) Status(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 
-	status, _, err := eve.StatusApi.GetStatus(context.Background(), nil)
+	status, _, err := Eve.StatusApi.GetStatus(context.Background(), nil)
 
 	if err != nil {
 		log.Printf("error getting TQ status, %s\n", err)
@@ -32,7 +36,7 @@ func (f *Fifth) status(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Co
 	}
 }
 
-func (f *Fifth) eveTime(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
+func (f *Fifth) EveTime(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 
 	//init the loc
 	loc, _ := time.LoadLocation("Atlantic/Reykjavik")
@@ -56,15 +60,7 @@ func (f *Fifth) eveTime(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.C
 
 }
 
-func fmtDuration(d time.Duration) string {
-	d = d.Round(time.Minute)
-	h := d / time.Hour
-	d -= h * time.Hour
-	m := d / time.Minute
-	return fmt.Sprintf("%dh %dm", h, m)
-}
-
-func (f *Fifth) who(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
+func (f *Fifth) Who(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 
 	name := ""
 
@@ -84,4 +80,12 @@ func (f *Fifth) who(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Conte
 	} else {
 		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Error :warning: %s\n", err))
 	}
+}
+
+func fmtDuration(d time.Duration) string {
+	d = d.Round(time.Minute)
+	h := d / time.Hour
+	d -= h * time.Hour
+	m := d / time.Minute
+	return fmt.Sprintf("%dh %dm", h, m)
 }

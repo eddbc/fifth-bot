@@ -18,7 +18,10 @@ import (
 	"github.com/gregjones/httpcache"
 )
 
-import _ "github.com/joho/godotenv/autoload"
+import (
+	_ "github.com/joho/godotenv/autoload"
+	"github.com/eddbc/fifth-bot/fifth"
+)
 
 // Version is a constant that stores the Disgord version information.
 const Version = "v0.0.0-alpha"
@@ -44,6 +47,8 @@ var botChannel string
 // command line arguments.
 func init() {
 
+	flag.BoolVar(&debug, "d", false, "Debug Mode")
+
 	// Set up caching for esi http client (in-memory for now)
 	transport := httpcache.NewTransport(httpcache.NewMemoryCache())
 	transport.Transport = &http.Transport{Proxy: http.ProxyFromEnvironment}
@@ -52,6 +57,7 @@ func init() {
 	// Get our API Client.
 	esiClient := goesi.NewAPIClient(client, useragent)
 	eve = esiClient.ESI
+	fifth.Eve = eve
 
 	// Get Default Bot Channel
 	botChannel = os.Getenv("FTH_BT_CHANNEL")
@@ -61,8 +67,6 @@ func init() {
 	if Session.Token == "" {
 		flag.StringVar(&Session.Token, "t", "", "Discord Authentication Token")
 	}
-
-	flag.BoolVar(&debug, "d", false, "Debug Mode")
 }
 
 func main() {
@@ -85,6 +89,9 @@ ___________.__  _____  __  .__   __________        __
 	if debug {
 		log.Println("debug enabled")
 	}
+
+	// Load defined command routes
+	routes()
 
 	// Verify a Token was provided
 	if Session.Token == "" {

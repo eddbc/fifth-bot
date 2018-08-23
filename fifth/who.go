@@ -1,4 +1,4 @@
-package main
+package fifth
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 
 func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 
-	res, _, err := eve.SearchApi.GetSearch(context.Background(), []string{"character"}, name, &esi.GetSearchOpts{
+	res, _, err := Eve.SearchApi.GetSearch(context.Background(), []string{"character"}, name, &esi.GetSearchOpts{
 		Strict: optional.NewBool(true),
 	})
 	if err != nil {
@@ -25,13 +25,13 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 	}
 
 	cid := res.Character[0]
-	char, _, err := eve.CharacterApi.GetCharactersCharacterId(context.Background(), cid, nil)
+	char, _, err := Eve.CharacterApi.GetCharactersCharacterId(context.Background(), cid, nil)
 	if err != nil {
 		log.Printf("error getting character details, %s\n", err)
 		return nil, err
 	}
 
-	corp, _, err := eve.CorporationApi.GetCorporationsCorporationId(context.Background(), char.CorporationId, nil)
+	corp, _, err := Eve.CorporationApi.GetCorporationsCorporationId(context.Background(), char.CorporationId, nil)
 	if err != nil {
 		log.Printf("error getting corp details, %s\n", err)
 		return nil, err
@@ -46,7 +46,7 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 	}
 
 	if char.AllianceId != 0 {
-		alli, _, err := eve.AllianceApi.GetAlliancesAllianceId(context.Background(), char.AllianceId, nil)
+		alli, _, err := Eve.AllianceApi.GetAlliancesAllianceId(context.Background(), char.AllianceId, nil)
 		if err != nil {
 			log.Printf("error getting alliance details, %s\n", err)
 			return nil, err
