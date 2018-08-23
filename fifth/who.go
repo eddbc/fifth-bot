@@ -12,7 +12,9 @@ import (
 
 func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 
-	res, _, err := Eve.SearchApi.GetSearch(context.Background(), []string{"character"}, name, &esi.GetSearchOpts{
+	ctx := context.Background()
+	strings := []string{"character"}
+	res, _, err := Eve.SearchApi.GetSearch(ctx, strings, name, &esi.GetSearchOpts{
 		Strict: optional.NewBool(true),
 	})
 	if err != nil {
