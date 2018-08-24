@@ -2,17 +2,21 @@ package fifth
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/antihax/goesi/esi"
 	"github.com/antihax/goesi/optional"
 	"github.com/bwmarrin/discordgo"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"net/url"
 )
 
 var supers = []string{"Hel", "Aeon", "Wyvern", "Nyx", "Vendetta", "Revenant", "Avatar", "Erebus", "Leviathan", "Ragnarok", "Molok", "Vanquisher", "Komodo"}
 var caps = []string{"Apostle", "Lif", "Ninazu", "Minokawa", "Chimera", "Archon", "Thanatos", "Nidhoggur", "Moros", "Phoenix", "Naglfar", "Revelation", "Vehement"}
+var fittedSlots = []int{27, 34, 19, 26, 11, 118, 87, 92, 98, 125, 132}
 
 func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 
@@ -92,10 +96,6 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 				}
 			}
 		}
-		fields = append(fields, &discordgo.MessageEmbedField{
-			Name:  "Top Ships",
-			Value: fmt.Sprintf("%s", topShips),
-		})
 
 		if len(capsFlown) > 0 {
 			c := ""
@@ -118,6 +118,22 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 				Name:   "Supers Flown",
 				Value:  s,
 				Inline: true,
+			})
+		}
+
+		if topShips != "" {
+			fields = append(fields, &discordgo.MessageEmbedField{
+				Name:   "Top Ships",
+				Value:  fmt.Sprintf("%s", topShips),
+				Inline: true,
+			})
+		}
+
+		cyno, _ := isCynoChar(cid)
+		if cyno != "" {
+			fields = append(fields, &discordgo.MessageEmbedField{
+				Name:  "**Potential Cyno**",
+				Value: cyno,
 			})
 		}
 	}
@@ -145,4 +161,40 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 	}
 
 	return embed, nil
+}
+
+func isCynoChar(characterID int32) (cyno string, err error) {
+	cyno = ""
+
+	r, err := http.Get(fmt.Sprintf("https://zkillboard.com/api/characterID/%v/losses/", characterID))
+	if err != nil {
+		return cyno, err
+	}
+
+	defer r.Body.Close()
+	body, err := ioutil.ReadAll(r.Body)
+
+	var kills []Kill
+	cynoLoss := 0
+	json.Unmarshal(body, &kills)
+
+	for _, kill := range kills {
+		for _, item := range kill.Victim.Items {
+			if item.ItemTypeID == 21096 {
+				for _, slot := range fittedSlots {
+					if item.Flag == slot {
+						if cynoLoss == 0 {
+							cynoLoss = kill.KillmailID
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if cynoLoss != 0 {
+		cyno = fmt.Sprintf("https://zkillboard.com/kill/%v/", cynoLoss)
+	}
+
+	return cyno, err
 }

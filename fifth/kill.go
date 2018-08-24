@@ -1,4 +1,4 @@
-package main
+package fifth
 
 import (
 	"context"
@@ -29,7 +29,7 @@ func (k *Kill) inflate() {
 		ctx := context.Background()
 
 		// get victim ship
-		ship, _, err := eve.UniverseApi.GetUniverseTypesTypeId(ctx, int32(k.Victim.ShipTypeID), nil)
+		ship, _, err := Eve.UniverseApi.GetUniverseTypesTypeId(ctx, int32(k.Victim.ShipTypeID), nil)
 		if err == nil {
 			k.Victim.ShipTypeName = ship.Name
 		} else {
@@ -37,7 +37,7 @@ func (k *Kill) inflate() {
 		}
 
 		// get victim character
-		vic, _, err := eve.CharacterApi.GetCharactersCharacterId(ctx, int32(k.Victim.CharacterID), nil)
+		vic, _, err := Eve.CharacterApi.GetCharactersCharacterId(ctx, int32(k.Victim.CharacterID), nil)
 		if err == nil {
 			k.Victim.CharacterName = vic.Name
 		} else {
@@ -45,7 +45,7 @@ func (k *Kill) inflate() {
 		}
 
 		// get victim corp
-		crp, _, err := eve.CorporationApi.GetCorporationsCorporationId(ctx, int32(k.Victim.CorporationID), nil)
+		crp, _, err := Eve.CorporationApi.GetCorporationsCorporationId(ctx, int32(k.Victim.CorporationID), nil)
 		if err == nil {
 			k.Victim.CorporationName = crp.Name
 			k.Victim.CorporationTicker = crp.Ticker
@@ -54,7 +54,7 @@ func (k *Kill) inflate() {
 		}
 
 		// get victim alliance
-		ali, _, err := eve.AllianceApi.GetAlliancesAllianceId(ctx, int32(k.Victim.AllianceID), nil)
+		ali, _, err := Eve.AllianceApi.GetAlliancesAllianceId(ctx, int32(k.Victim.AllianceID), nil)
 		if err == nil {
 			k.Victim.AllianceName = ali.Name
 			k.Victim.AllianceTicker = ali.Ticker
@@ -81,7 +81,7 @@ func (s byDamage) Less(i, j int) bool {
 func (k *Kill) getFinalBlow() (Attacker, error) {
 	for _, at := range k.Attackers {
 		if at.FinalBlow {
-			fb, _, err := eve.CharacterApi.GetCharactersCharacterId(context.Background(), int32(at.CharacterID), nil)
+			fb, _, err := Eve.CharacterApi.GetCharactersCharacterId(context.Background(), int32(at.CharacterID), nil)
 			if err == nil {
 				at.CharacterName = fb.Name
 				return at, nil
@@ -106,7 +106,7 @@ func (k *Kill) interestingName() (string, error) {
 		atkrs := k.InterestingAttackers
 		sort.Sort(byDamage(atkrs))
 		for _, atk := range atkrs {
-			a, _, err := eve.CharacterApi.GetCharactersCharacterId(context.Background(), int32(atk.CharacterID), nil)
+			a, _, err := Eve.CharacterApi.GetCharactersCharacterId(context.Background(), int32(atk.CharacterID), nil)
 			if err == nil {
 				name = a.Name
 			}

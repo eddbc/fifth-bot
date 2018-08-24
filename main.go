@@ -16,9 +16,7 @@ import (
 	"github.com/antihax/goesi/esi"
 	"github.com/bwmarrin/discordgo"
 	"github.com/gregjones/httpcache"
-)
 
-import (
 	"github.com/eddbc/fifth-bot/fifth"
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -112,7 +110,7 @@ ___________.__  _____  __  .__   __________        __
 	fifth.Debug = debug
 
 	// Open ZKill websocket for new killmails
-	go listenZKill()
+	go fifth.ListenZKill()
 
 	// Wait for a CTRL-C
 	log.Printf(`Now running. Press CTRL-C to exit.`)

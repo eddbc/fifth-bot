@@ -79,7 +79,10 @@ func (f *Fifth) Who(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Conte
 	embed, err := getCharacterInfoEmbed(name)
 
 	if err == nil {
-		ds.ChannelMessageSendEmbed(dm.ChannelID, embed)
+		_, err := ds.ChannelMessageSendEmbed(dm.ChannelID, embed)
+		if err != nil {
+			log.Printf("error: %+v", err)
+		}
 	} else {
 		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Error :warning: %s\n", err))
 	}

@@ -1,10 +1,9 @@
-package main
+package fifth
 
 import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/eddbc/fifth-bot/fifth"
 	"github.com/eddbc/fifth-bot/isk"
 	"github.com/gorilla/websocket"
 	"log"
@@ -17,7 +16,7 @@ var entitiesOfInterest = []int{
 	98481691, // nogrl
 }
 
-func listenZKill() {
+func ListenZKill() {
 	url := "wss://zkillboard.com:2096"
 	c, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
@@ -52,7 +51,7 @@ func listenZKill() {
 }
 
 func logIgnore(reason string) {
-	if debug {
+	if Debug {
 		//log.Printf("ignoring kill. reason: %v\n", reason)
 	}
 }
@@ -90,7 +89,7 @@ func processKill(kill Kill) {
 
 	// ignore unrelated kills in highsec
 	if !isKill && !isLoss {
-		sys, _, err := eve.UniverseApi.GetUniverseSystemsSystemId(context.Background(), int32(kill.SolarSystemID), nil)
+		sys, _, err := Eve.UniverseApi.GetUniverseSystemsSystemId(context.Background(), int32(kill.SolarSystemID), nil)
 		if err == nil {
 			if sys.SecurityStatus >= 0.5 {
 				logIgnore("high-sec")
@@ -138,9 +137,9 @@ func processKill(kill Kill) {
 
 	// send message to appropriate channels
 	if important {
-		fifth.SendImportantMsg(msg)
+		SendImportantMsg(msg)
 	} else {
-		fifth.SendMsg(msg)
+		SendMsg(msg)
 	}
 
 }
@@ -158,7 +157,7 @@ func isEntityRelated(km Kill) (kill bool, loss bool, err error) {
 		if r := recover(); r != nil {
 			err = errors.New("error getting related information")
 			log.Printf("error getting related information for kill %v: %v+", km.KillmailID, r)
-			fifth.SendDebugMsg(fmt.Sprintf("error getting related information for kill: <%v>", km.getUrl()))
+			SendDebugMsg(fmt.Sprintf("error getting related information for kill: <%v>", km.getUrl()))
 		}
 	}()
 
