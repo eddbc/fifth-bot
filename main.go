@@ -30,10 +30,6 @@ const useragent = "fifth-bot, edd_reynolds on slack"
 
 var debug = false
 
-var debugChannel = "459341365562572803"     // testing-lab
-var spamChannel = "459997163787649025"      // pit of dispair
-var importantChannel = "385195528360820739" // general
-
 // Session is declared in the global space so it can be easily used
 // throughout this program.
 // In this use case, there is no error that would be returned.
@@ -112,6 +108,9 @@ ___________.__  _____  __  .__   __________        __
 		os.Exit(1)
 	}
 
+	fifth.Session = Session
+	fifth.Debug = debug
+
 	// Open ZKill websocket for new killmails
 	go listenZKill()
 
@@ -125,25 +124,4 @@ ___________.__  _____  __  .__   __________        __
 	Session.Close()
 
 	// Exit Normally.
-}
-
-func sendMsg(msg string) {
-	sendMsgToChan(spamChannel, msg)
-}
-
-func sendImportantMsg(msg string) {
-	sendMsgToChan(importantChannel, msg)
-}
-
-func sendDebugMsg(msg string) {
-	Session.ChannelMessageSend(debugChannel, msg)
-}
-
-func sendMsgToChan(chann string, msg string) {
-	log.Println(msg)
-	if !debug {
-		Session.ChannelMessageSend(chann, msg)
-	} else {
-		Session.ChannelMessageSend(debugChannel, msg)
-	}
 }

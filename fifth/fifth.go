@@ -11,6 +11,8 @@ import (
 )
 
 var Eve *esi.APIClient
+var Session *discordgo.Session
+var Debug bool
 
 const useragent = "fifth-bot, edd_reynolds on slack"
 

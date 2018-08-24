@@ -1,29 +1,14 @@
 package fifth
 
 import (
-	"context"
 	"fmt"
 	"github.com/antihax/goesi/esi"
 	"github.com/bwmarrin/discordgo"
 	"github.com/eddbc/fifth-bot/mux"
-	"github.com/robfig/cron"
 	"log"
 	"sync"
 )
 
-var C *cron.Cron
-
-var ctx context.Context
-
-func init() {
-	ctx = context.Background()
-	C = cron.New()
-
-	//C.AddFunc("@every 10s", func(){getAllContracts()})
-
-	C.Start()
-
-}
 func (f *Fifth) SearchCapitalContracts(ds *discordgo.Session, dm *discordgo.Message, muxCtx *mux.Context) {
 	region := ""
 	for k, v := range muxCtx.Fields {

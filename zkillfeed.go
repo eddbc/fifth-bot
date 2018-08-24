@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"time"
+	"github.com/eddbc/fifth-bot/fifth"
 )
 
 var entitiesOfInterest = []int{
@@ -137,9 +138,9 @@ func processKill(kill Kill) {
 
 	// send message to appropriate channels
 	if important {
-		sendImportantMsg(msg)
+		fifth.SendImportantMsg(msg)
 	} else {
-		sendMsg(msg)
+		fifth.SendMsg(msg)
 	}
 
 }
@@ -157,7 +158,7 @@ func isEntityRelated(km Kill) (kill bool, loss bool, err error) {
 		if r := recover(); r != nil {
 			err = errors.New("error getting related information")
 			log.Printf("error getting related information for kill %v: %v+", km.KillmailID, r)
-			sendDebugMsg(fmt.Sprintf("error getting related information for kill: <%v>", km.getUrl()))
+			fifth.SendDebugMsg(fmt.Sprintf("error getting related information for kill: <%v>", km.getUrl()))
 		}
 	}()
 
