@@ -14,7 +14,7 @@ func init() {
 	C = cron.New()
 
 	//C.AddFunc("@every 10s", func(){getAllContracts()})
-	C.AddFunc("0 0 20 * * ?", func() { circlejerk() })
+	C.AddFunc("0 0 19 * * *", func() { circlejerk() })
 
 	C.Start()
 }
