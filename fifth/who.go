@@ -180,7 +180,7 @@ func isCynoChar(characterID int32) (cyno string, err error) {
 
 	for _, kill := range kills {
 		for _, item := range kill.Victim.Items {
-			if item.ItemTypeID == 21096 {
+			if item.ItemTypeID == 21096 || item.ItemTypeID == 28646 {
 				for _, slot := range fittedSlots {
 					if item.Flag == slot {
 						if cynoLoss == 0 {
