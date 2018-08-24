@@ -11,6 +11,9 @@ import (
 	"net/url"
 )
 
+var supers = []string{"Hel", "Aeon", "Wyvern", "Nyx", "Vendetta", "Revenant", "Avatar", "Erebus", "Leviathan", "Ragnarok", "Molok", "Vanquisher", "Komodo"}
+var caps = []string{"Apostle", "Lif", "Ninazu", "Minokawa", "Chimera", "Archon", "Thanatos", "Nidhoggur", "Moros", "Phoenix", "Naglfar", "Revelation", "Vehement"}
+
 func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 
 	ctx := context.Background()
@@ -64,13 +67,27 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 	stats, e := zkillstats.get(cid)
 	if e == nil {
 		topShips := ""
+		var capsFlown []string
+		var supersFlown []string
 		for _, st := range stats.TopAllTime {
 			if st.Type == "ship" {
-				for i := 0; i < 5; i++ {
-					stat := st.Data[i]
+				for i, stat := range st.Data {
 					ship, _, err := Eve.UniverseApi.GetUniverseTypesTypeId(ctx, int32(stat.ShipTypeId), nil)
-					if err == nil {
-						topShips = fmt.Sprintf("%v%v: %v kills\n", topShips, ship.Name, stat.Kills)
+					if i < 5 {
+						if err == nil {
+							topShips = fmt.Sprintf("%v%v: %v kills\n", topShips, ship.Name, stat.Kills)
+						}
+					}
+
+					for _, v := range supers {
+						if ship.Name == v {
+							supersFlown = append(supersFlown, v)
+						}
+					}
+					for _, v := range caps {
+						if ship.Name == v {
+							capsFlown = append(capsFlown, v)
+						}
 					}
 				}
 			}
@@ -79,6 +96,30 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 			Name:  "Top Ships",
 			Value: fmt.Sprintf("%s", topShips),
 		})
+
+		if len(capsFlown) > 0 {
+			c := ""
+			for _, cap := range capsFlown {
+				c = fmt.Sprintf("%v%v\n", c, cap)
+			}
+			fields = append(fields, &discordgo.MessageEmbedField{
+				Name:   "Caps Flown",
+				Value:  c,
+				Inline: true,
+			})
+		}
+
+		if len(supersFlown) > 0 {
+			s := ""
+			for _, soup := range supersFlown {
+				s = fmt.Sprintf("%v%v\n", s, soup)
+			}
+			fields = append(fields, &discordgo.MessageEmbedField{
+				Name:   "Supers Flown",
+				Value:  s,
+				Inline: true,
+			})
+		}
 	}
 
 	fields = append(fields, &discordgo.MessageEmbedField{

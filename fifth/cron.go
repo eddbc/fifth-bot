@@ -1,8 +1,8 @@
 package fifth
 
 import (
-	"github.com/robfig/cron"
 	"context"
+	"github.com/robfig/cron"
 )
 
 var C *cron.Cron
@@ -14,11 +14,11 @@ func init() {
 	C = cron.New()
 
 	//C.AddFunc("@every 10s", func(){getAllContracts()})
-	C.AddFunc("0 0 20 * * ?", func(){circlejerk()})
+	C.AddFunc("0 0 20 * * ?", func() { circlejerk() })
 
 	C.Start()
 }
 
-func circlejerk(){
+func circlejerk() {
 	SendImportantMsg("Daily reminder: Don't forget to circlejerk! <https://www.pandemic-legion.pl/forums/topic/16750-circlejerk/?do=getNewComment>")
 }

@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/eddbc/fifth-bot/fifth"
 	"github.com/eddbc/fifth-bot/isk"
 	"github.com/gorilla/websocket"
 	"log"
 	"time"
-	"github.com/eddbc/fifth-bot/fifth"
 )
 
 var entitiesOfInterest = []int{
