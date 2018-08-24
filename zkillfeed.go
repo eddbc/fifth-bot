@@ -52,7 +52,7 @@ func listenZKill() {
 
 func logIgnore(reason string) {
 	if debug {
-		log.Printf("ignoring kill. reason: %v\n", reason)
+		//log.Printf("ignoring kill. reason: %v\n", reason)
 	}
 }
 
@@ -157,7 +157,7 @@ func isEntityRelated(km Kill) (kill bool, loss bool, err error) {
 		if r := recover(); r != nil {
 			err = errors.New("error getting related information")
 			log.Printf("error getting related information for kill %v: %v+", km.KillmailID, r)
-			sendDebugMsg(fmt.Sprintf("error: crashing because of this kill: %v", km.getUrl()))
+			sendDebugMsg(fmt.Sprintf("error getting related information for kill: <%v>", km.getUrl()))
 		}
 	}()
 
@@ -166,7 +166,7 @@ func isEntityRelated(km Kill) (kill bool, loss bool, err error) {
 		loss = loss || km.isVictim(id)
 	}
 
-	return kill, loss, nil
+	return kill, loss, err
 }
 
 type subscribe struct {

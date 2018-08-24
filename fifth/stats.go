@@ -1024,8 +1024,9 @@ type ZKillCharacterStatsResp struct {
 		Type string `json:"type"`
 		Data []struct {
 			Kills         int    `json:"kills"`
-			CharacterID   int    `json:"characterID"`
-			CharacterName string `json:"characterName"`
+			//CharacterID   int    `json:"characterID"`
+			//CorporationID int    `json:"corporationID"`
+			ShipTypeId    int    `json:"shipTypeID"`
 		} `json:"data"`
 	} `json:"topAllTime"`
 	Trophies struct {

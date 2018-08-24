@@ -8,6 +8,7 @@ import (
 	"github.com/antihax/goesi/optional"
 	"github.com/bwmarrin/discordgo"
 	"log"
+	"net/url"
 )
 
 func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
@@ -62,12 +63,36 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 
 	stats, e := zkillstats.get(cid)
 	if e == nil {
+		topShips := ""
 		for _, st := range stats.TopAllTime {
 			if st.Type == "ship" {
-				log.Printf("%v", st.Data)
+				for i:=0; i<5; i++ {
+					stat := st.Data[i]
+					ship, _, err := Eve.UniverseApi.GetUniverseTypesTypeId(ctx, int32(stat.ShipTypeId), nil)
+					if err == nil {
+						topShips = fmt.Sprintf("%v%v: %v kills\n", topShips, ship.Name, stat.Kills)
+					}
+				}
 			}
 		}
+		fields = append(fields, &discordgo.MessageEmbedField{
+			Name:   "Top Ships",
+			Value:  fmt.Sprintf("%s", topShips),
+		})
 	}
+
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "zKill",
+		Value:  fmt.Sprintf("https://zkillboard.com/character/%v/", cid),
+		Inline: true,
+	})
+	fields = append(fields, &discordgo.MessageEmbedField{
+		Name:   "EveWho",
+		Value:  fmt.Sprintf("https://evewho.com/pilot/%v/", url.QueryEscape(char.Name)),
+		Inline: true,
+	})
+
+
 
 	embed := &discordgo.MessageEmbed{
 		Author: &discordgo.MessageEmbedAuthor{},
