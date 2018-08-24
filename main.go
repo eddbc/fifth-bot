@@ -19,8 +19,8 @@ import (
 )
 
 import (
-	_ "github.com/joho/godotenv/autoload"
 	"github.com/eddbc/fifth-bot/fifth"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 // Version is a constant that stores the Disgord version information.

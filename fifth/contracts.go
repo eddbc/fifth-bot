@@ -1,14 +1,14 @@
 package fifth
 
 import (
-	"github.com/robfig/cron"
 	"context"
-	"log"
-	"sync"
+	"fmt"
 	"github.com/antihax/goesi/esi"
 	"github.com/bwmarrin/discordgo"
 	"github.com/eddbc/fifth-bot/mux"
-	"fmt"
+	"github.com/robfig/cron"
+	"log"
+	"sync"
 )
 
 var C *cron.Cron
@@ -50,7 +50,6 @@ func (f *Fifth) SearchCapitalContracts(ds *discordgo.Session, dm *discordgo.Mess
 	log.Printf("%v contracts found", len(contracts))
 	_, err = ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("%v contracts found", len(contracts)))
 }
-
 
 func getAllContracts() {
 	log.Println("cron job firing")

@@ -3,14 +3,15 @@ package fifth
 import (
 	"context"
 	"fmt"
+	"github.com/antihax/goesi/esi"
 	"github.com/bwmarrin/discordgo"
 	"github.com/eddbc/fifth-bot/mux"
 	"log"
 	"time"
-	"github.com/antihax/goesi/esi"
 )
 
 var Eve *esi.APIClient
+
 const useragent = "fifth-bot, edd_reynolds on slack"
 
 type Fifth struct{}

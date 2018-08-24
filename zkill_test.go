@@ -1,13 +1,13 @@
 package main
 
 import (
-	"testing"
-	"net/http"
 	"encoding/json"
 	"io/ioutil"
+	"net/http"
+	"testing"
 )
 
-func getKill() (Kill, error){
+func getKill() (Kill, error) {
 	var kill Kill
 	r, err := http.Get("https://zkillboard.com/api/killID/72019508/")
 	if err != nil {
@@ -25,16 +25,16 @@ func getKill() (Kill, error){
 	return kill, err
 }
 
-func TestInterestingKill(t *testing.T){
+func TestInterestingKill(t *testing.T) {
 
 	entitiesOfInterest = []int{
 		1354830081, // goons
-		99005338,	// horde
-		98481691, // nogrl
+		99005338,   // horde
+		98481691,   // nogrl
 	}
 
 	kill, err := getKill()
-	if err != nil{
+	if err != nil {
 		t.FailNow()
 		return
 	}

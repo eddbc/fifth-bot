@@ -1,14 +1,13 @@
 package main
 
 import (
-	"time"
-	"fmt"
 	"context"
-	"log"
 	"errors"
+	"fmt"
+	"log"
 	"sort"
+	"time"
 )
-
 
 //
 // Methods
@@ -21,7 +20,7 @@ func (k *Kill) getUrl() string {
 /*
 Get related data from provided IDs
 E.g. get character and corporation names
- */
+*/
 func (k *Kill) inflate() {
 	if k.inflated != true {
 		// zkill url
@@ -33,33 +32,41 @@ func (k *Kill) inflate() {
 		ship, _, err := eve.UniverseApi.GetUniverseTypesTypeId(ctx, int32(k.Victim.ShipTypeID), nil)
 		if err == nil {
 			k.Victim.ShipTypeName = ship.Name
-		} else {log.Printf("inflate victim ship: %v", err)}
+		} else {
+			log.Printf("inflate victim ship: %v", err)
+		}
 
 		// get victim character
 		vic, _, err := eve.CharacterApi.GetCharactersCharacterId(ctx, int32(k.Victim.CharacterID), nil)
 		if err == nil {
 			k.Victim.CharacterName = vic.Name
-		} else {log.Printf("inflate character: %v", err)}
+		} else {
+			log.Printf("inflate character: %v", err)
+		}
 
 		// get victim corp
 		crp, _, err := eve.CorporationApi.GetCorporationsCorporationId(ctx, int32(k.Victim.CorporationID), nil)
 		if err == nil {
-			k.Victim.CorporationName   = crp.Name
+			k.Victim.CorporationName = crp.Name
 			k.Victim.CorporationTicker = crp.Ticker
-		} else {log.Printf("inflate corp: %v", err)}
+		} else {
+			log.Printf("inflate corp: %v", err)
+		}
 
 		// get victim alliance
 		ali, _, err := eve.AllianceApi.GetAlliancesAllianceId(ctx, int32(k.Victim.AllianceID), nil)
 		if err == nil {
-			k.Victim.AllianceName   = ali.Name
+			k.Victim.AllianceName = ali.Name
 			k.Victim.AllianceTicker = ali.Ticker
-		} else {log.Printf("inflate alliance: %v", err)}
+		} else {
+			log.Printf("inflate alliance: %v", err)
+		}
 
 		k.inflated = true
 	}
 }
 
-func (s byDamage) Len () int {
+func (s byDamage) Len() int {
 	return len(s)
 }
 
@@ -78,7 +85,9 @@ func (k *Kill) getFinalBlow() (Attacker, error) {
 			if err == nil {
 				at.CharacterName = fb.Name
 				return at, nil
-			} else {log.Printf("inflate final blow character: %v", err)}
+			} else {
+				log.Printf("inflate final blow character: %v", err)
+			}
 		}
 	}
 
@@ -109,15 +118,15 @@ func (k *Kill) interestingName() (string, error) {
 
 /*
 Check if an entity (character, corp or alliance) was involved in a kill
- */
-func (k *Kill) involved(entityId int) (bool) {
+*/
+func (k *Kill) involved(entityId int) bool {
 	return k.isAttacker(entityId) || k.isVictim(entityId)
 }
 
 /*
 Check if an entity (character, corp or alliance) was an attacker in a kill
- */
-func (k *Kill) isAttacker(entityId int) (bool) {
+*/
+func (k *Kill) isAttacker(entityId int) bool {
 
 	k.InterestingAttackers = nil
 
@@ -148,8 +157,8 @@ func (k *Kill) isAttacker(entityId int) (bool) {
 
 /*
 Check if an entity (character, corp or alliance) was the victim in a kill
- */
-func (k *Kill) isVictim(entityId int) (bool) {
+*/
+func (k *Kill) isVictim(entityId int) bool {
 	loss := false
 	if k.Victim.CharacterID == entityId {
 		loss = true
@@ -171,13 +180,13 @@ func (k *Kill) isVictim(entityId int) (bool) {
 type byDamage []Attacker
 
 type Kill struct {
-	Attackers []Attacker 	`json:"attackers"`
+	Attackers            []Attacker `json:"attackers"`
 	InterestingAttackers []Attacker
-	KillmailID    int       `json:"killmail_id"`
-	KillmailTime  time.Time `json:"killmail_time"`
-	SolarSystemID int       `json:"solar_system_id"`
-	Victim 		  Victim 	`json:"victim"`
-	Zkb struct {
+	KillmailID           int       `json:"killmail_id"`
+	KillmailTime         time.Time `json:"killmail_time"`
+	SolarSystemID        int       `json:"solar_system_id"`
+	Victim               Victim    `json:"victim"`
+	Zkb                  struct {
 		LocationID  int     `json:"locationID"`
 		Hash        string  `json:"hash"`
 		FittedValue float64 `json:"fittedValue"`
@@ -186,15 +195,15 @@ type Kill struct {
 		Npc         bool    `json:"npc"`
 		Solo        bool    `json:"solo"`
 		Awox        bool    `json:"awox"`
-		url			string
+		url         string
 	} `json:"zkb"`
-	inflated		bool
+	inflated bool
 }
 
 type Victim struct {
 	*Character
-	DamageTaken   int `json:"damage_taken"`
-	Items         []struct {
+	DamageTaken int `json:"damage_taken"`
+	Items       []struct {
 		Flag              int `json:"flag"`
 		ItemTypeID        int `json:"item_type_id"`
 		QuantityDropped   int `json:"quantity_dropped,omitempty"`
@@ -223,17 +232,17 @@ type Attacker struct {
 }
 
 type Character struct {
-	AllianceID     	  int     `json:"alliance_id,omitempty"`
-	AllianceName   	  string
-	AllianceTicker    string
+	AllianceID     int `json:"alliance_id,omitempty"`
+	AllianceName   string
+	AllianceTicker string
 
-	CorporationID  	  int     `json:"corporation_id,omitempty"`
-	CorporationName	  string
+	CorporationID     int `json:"corporation_id,omitempty"`
+	CorporationName   string
 	CorporationTicker string
 
-	CharacterID    	  int     `json:"character_id,omitempty"`
-	CharacterName  	  string
+	CharacterID   int `json:"character_id,omitempty"`
+	CharacterName string
 
-	ShipTypeID     	  int     `json:"ship_type_id,omitempty"`
-	ShipTypeName	  string
+	ShipTypeID   int `json:"ship_type_id,omitempty"`
+	ShipTypeName string
 }

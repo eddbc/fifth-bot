@@ -5,8 +5,8 @@ package main
 // by default to demonstrate how to extend the Disgord bot.
 
 import (
-	"github.com/eddbc/fifth-bot/mux"
 	"github.com/eddbc/fifth-bot/fifth"
+	"github.com/eddbc/fifth-bot/mux"
 )
 
 // Router is registered as a global variable to allow easy access to the

@@ -1,10 +1,10 @@
 package fifth
 
 import (
-	"testing"
+	"github.com/antihax/goesi"
 	"github.com/gregjones/httpcache"
 	"net/http"
-	"github.com/antihax/goesi"
+	"testing"
 )
 
 func init() {
@@ -17,7 +17,7 @@ func init() {
 	Eve = esiClient.ESI
 }
 
-func TestWhoCommand(t *testing.T){
+func TestWhoCommand(t *testing.T) {
 
 	dm, err := getCharacterInfoEmbed("Edd Reynolds")
 	if err != nil {

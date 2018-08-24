@@ -66,7 +66,7 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 		topShips := ""
 		for _, st := range stats.TopAllTime {
 			if st.Type == "ship" {
-				for i:=0; i<5; i++ {
+				for i := 0; i < 5; i++ {
 					stat := st.Data[i]
 					ship, _, err := Eve.UniverseApi.GetUniverseTypesTypeId(ctx, int32(stat.ShipTypeId), nil)
 					if err == nil {
@@ -76,8 +76,8 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 			}
 		}
 		fields = append(fields, &discordgo.MessageEmbedField{
-			Name:   "Top Ships",
-			Value:  fmt.Sprintf("%s", topShips),
+			Name:  "Top Ships",
+			Value: fmt.Sprintf("%s", topShips),
 		})
 	}
 
@@ -91,8 +91,6 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 		Value:  fmt.Sprintf("https://evewho.com/pilot/%v/", url.QueryEscape(char.Name)),
 		Inline: true,
 	})
-
-
 
 	embed := &discordgo.MessageEmbed{
 		Author: &discordgo.MessageEmbedAuthor{},
