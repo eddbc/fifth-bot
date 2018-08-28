@@ -22,7 +22,7 @@ import (
 )
 
 // Version is a constant that stores the Disgord version information.
-const Version = "v0.0.0-alpha"
+const Version = "v0.1"
 
 const useragent = "fifth-bot, edd_reynolds on slack"
 
@@ -34,8 +34,10 @@ var debug = false
 var Session, _ = discordgo.New()
 
 var eve *esi.APIClient
+var httpClient *http.Client
 
-var botChannel string
+var eveSSOId string
+var eveSSOKey string
 
 // Read in all configuration options from both environment variables and
 // command line arguments.
@@ -46,15 +48,12 @@ func init() {
 	// Set up caching for esi http client (in-memory for now)
 	transport := httpcache.NewTransport(httpcache.NewMemoryCache())
 	transport.Transport = &http.Transport{Proxy: http.ProxyFromEnvironment}
-	client := &http.Client{Transport: transport}
+	httpClient := &http.Client{Transport: transport}
 
 	// Get our API Client.
-	esiClient := goesi.NewAPIClient(client, useragent)
+	esiClient := goesi.NewAPIClient(httpClient, useragent)
 	eve = esiClient.ESI
 	fifth.Eve = eve
-
-	// Get Default Bot Channel
-	botChannel = os.Getenv("FTH_BT_CHANNEL")
 
 	// Discord Authentication Token
 	Session.Token = os.Getenv("FTH_BT_TOKEN")
@@ -105,6 +104,8 @@ ___________.__  _____  __  .__   __________        __
 		log.Printf("error opening connection to Discord, %s\n", err)
 		os.Exit(1)
 	}
+
+	Session.UpdateStatus(0, "Rainbow 6 Siege")
 
 	fifth.Session = Session
 	fifth.Debug = debug

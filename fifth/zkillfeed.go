@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var entitiesOfInterest = []int{
+var entitiesOfInterest = []int32{
 	//1354830081, // goons
 	//99005338,	// horde
 	98481691, // nogrl
@@ -109,7 +109,7 @@ func processKill(kill Kill) {
 	}
 
 	if isLoss { // ship lost by entity of interest
-		msg = fmt.Sprintf("%v is a disgusting feeder", kill.Victim.CharacterName)
+		msg = fmt.Sprintf("%v is a disgusting feeder\n", kill.Victim.CharacterName)
 		if value > 500000000 {
 			important = true
 		}
@@ -118,22 +118,21 @@ func processKill(kill Kill) {
 
 		if value >= 1000000000 {
 			// 1B+ kills are important
-			msg = fmt.Sprintf("%v killed something big. Good job team.", name)
+			msg = fmt.Sprintf("%v killed something big. Good job team.\n", name)
 			important = true
 		} else {
 			// <1B kills are not important
-			msg = fmt.Sprintf("%v isn't completely useless.", name)
+			msg = fmt.Sprintf("%v isn't completely useless.\n", name)
 		}
 	} else if isExpsv { // kill is expensive
 		msg = fmt.Sprintf("%v worth %v ISK died!", kill.Victim.ShipTypeName, isk.NearestThousandFormat(kill.Zkb.TotalValue))
 	}
 
 	// put zKill link in message
-	if msg == "" {
-		msg = kill.Zkb.url
-	} else {
-		msg = fmt.Sprintf("%v <%v>", msg, kill.Zkb.url)
-	}
+	msg = fmt.Sprintf("%v%v [%v] %v ISK - %v (%v) <%v>",
+		msg, kill.Victim.ShipTypeName, kill.Victim.ticker(),
+		isk.NearestThousandFormat(kill.Zkb.TotalValue), kill.SolarSystemName,
+		kill.RegionName, kill.Zkb.url)
 
 	// send message to appropriate channels
 	if important {

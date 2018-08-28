@@ -175,7 +175,7 @@ func isCynoChar(characterID int32) (cyno string, err error) {
 	body, err := ioutil.ReadAll(r.Body)
 
 	var kills []Kill
-	cynoLoss := 0
+	var cynoLoss int32 = 0
 	json.Unmarshal(body, &kills)
 
 	for _, kill := range kills {

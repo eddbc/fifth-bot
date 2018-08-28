@@ -28,6 +28,21 @@ func (k *Kill) inflate() {
 
 		ctx := context.Background()
 
+		sys, _, err := Eve.UniverseApi.GetUniverseSystemsSystemId(ctx, int32(k.SolarSystemID), nil)
+		if err == nil {
+			k.SolarSystemName = sys.Name
+			c, _, err := Eve.UniverseApi.GetUniverseConstellationsConstellationId(ctx, int32(sys.ConstellationId), nil)
+			if err == nil {
+				reg, _, err := Eve.UniverseApi.GetUniverseRegionsRegionId(ctx, int32(c.RegionId), nil)
+				if err == nil {
+					k.RegionID = reg.RegionId
+					k.RegionName = reg.Name
+				}
+			}
+		} else {
+			log.Printf("inflate solar system: %v", err)
+		}
+
 		// get victim ship
 		ship, _, err := Eve.UniverseApi.GetUniverseTypesTypeId(ctx, int32(k.Victim.ShipTypeID), nil)
 		if err == nil {
@@ -119,14 +134,14 @@ func (k *Kill) interestingName() (string, error) {
 /*
 Check if an entity (character, corp or alliance) was involved in a kill
 */
-func (k *Kill) involved(entityId int) bool {
+func (k *Kill) involved(entityId int32) bool {
 	return k.isAttacker(entityId) || k.isVictim(entityId)
 }
 
 /*
 Check if an entity (character, corp or alliance) was an attacker in a kill
 */
-func (k *Kill) isAttacker(entityId int) bool {
+func (k *Kill) isAttacker(entityId int32) bool {
 
 	k.InterestingAttackers = nil
 
@@ -158,7 +173,7 @@ func (k *Kill) isAttacker(entityId int) bool {
 /*
 Check if an entity (character, corp or alliance) was the victim in a kill
 */
-func (k *Kill) isVictim(entityId int) bool {
+func (k *Kill) isVictim(entityId int32) bool {
 	loss := false
 	if k.Victim.CharacterID == entityId {
 		loss = true
@@ -173,6 +188,14 @@ func (k *Kill) isVictim(entityId int) bool {
 	return loss
 }
 
+func (c *Character) ticker() string {
+	if c.AllianceTicker == "" {
+		return c.CorporationTicker
+	} else {
+		return c.AllianceTicker
+	}
+}
+
 //
 // Structs
 //
@@ -182,10 +205,13 @@ type byDamage []Attacker
 type Kill struct {
 	Attackers            []Attacker `json:"attackers"`
 	InterestingAttackers []Attacker
-	KillmailID           int       `json:"killmail_id"`
+	KillmailID           int32     `json:"killmail_id"`
 	KillmailTime         time.Time `json:"killmail_time"`
-	SolarSystemID        int       `json:"solar_system_id"`
-	Victim               Victim    `json:"victim"`
+	SolarSystemID        int32     `json:"solar_system_id"`
+	SolarSystemName      string
+	RegionID             int32
+	RegionName           string
+	Victim               Victim `json:"victim"`
 	Zkb                  struct {
 		LocationID  int     `json:"locationID"`
 		Hash        string  `json:"hash"`
@@ -232,17 +258,17 @@ type Attacker struct {
 }
 
 type Character struct {
-	AllianceID     int `json:"alliance_id,omitempty"`
+	AllianceID     int32 `json:"alliance_id,omitempty"`
 	AllianceName   string
 	AllianceTicker string
 
-	CorporationID     int `json:"corporation_id,omitempty"`
+	CorporationID     int32 `json:"corporation_id,omitempty"`
 	CorporationName   string
 	CorporationTicker string
 
-	CharacterID   int `json:"character_id,omitempty"`
+	CharacterID   int32 `json:"character_id,omitempty"`
 	CharacterName string
 
-	ShipTypeID   int `json:"ship_type_id,omitempty"`
+	ShipTypeID   int32 `json:"ship_type_id,omitempty"`
 	ShipTypeName string
 }
