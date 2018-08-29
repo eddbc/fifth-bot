@@ -62,11 +62,11 @@ func processKill(kill Kill) {
 	msg := ""
 	value := kill.Zkb.TotalValue
 
-	// ignore all kills under 5M, to reduce spam
-	//if value < 5000000 {
-	//	logIgnore("<5M ISK")
-	//	return
-	//}
+	// ignore all kills under 1M, to reduce spam
+	if value < 1000000 {
+		logIgnore("<1M ISK")
+		return
+	}
 
 	// ignore kills more that 24 hours old
 	if kill.KillmailTime.Before(time.Now().Add(-1 * (24 * time.Hour))) {
