@@ -4,7 +4,7 @@ import "log"
 
 var debugChannel = "459341365562572803"     // testing-lab
 var spamChannel = "459997163787649025"      // pit of dispair
-var importantChannel = "385195528360820739" // general
+var importantChannel = "484157249141604353" // general
 
 func SendMsg(msg string) {
 	SendMsgToChan(spamChannel, msg)
