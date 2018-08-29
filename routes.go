@@ -5,8 +5,10 @@ package main
 // by default to demonstrate how to extend the Disgord bot.
 
 import (
+	"github.com/bwmarrin/discordgo"
 	"github.com/eddbc/fifth-bot/fifth"
 	"github.com/eddbc/fifth-bot/mux"
+	"log"
 )
 
 // Router is registered as a global variable to allow easy access to the
@@ -27,6 +29,16 @@ func routes() {
 	Router.Route("time", "Get current EVE time, or time until a given EVE time (eg. ~time 20:00)", f.EveTime)
 	Router.Route("who", "Get info about an EVE character", f.Who)
 	if debug {
+		Router.Route("servers", "", f.Servers)
 		Router.Route("caps", "Search public contracts in a region for capitals", f.SearchCapitalContracts)
+	}
+
+	Session.AddHandlerOnce(connectedMsg)
+}
+
+func connectedMsg(ds *discordgo.Session, _ *discordgo.PresenceUpdate) {
+	log.Printf("Connected to %v servers :", len(Session.State.Guilds))
+	for _, server := range ds.State.Guilds {
+		log.Printf("%v - (%v)", server.Name, server.ID)
 	}
 }

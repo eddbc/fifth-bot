@@ -88,6 +88,14 @@ func (f *Fifth) Who(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Conte
 	}
 }
 
+func (f *Fifth) Servers(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
+	msg := fmt.Sprintf("**Connected to %v servers :**", len(Session.State.Guilds))
+	for _, guild := range ds.State.Guilds {
+		msg = fmt.Sprintf("%v\n * %v - (%v)", msg, guild.Name, guild.ID)
+	}
+	SendDebugMsg(msg)
+}
+
 func fmtDuration(d time.Duration) string {
 	d = d.Round(time.Minute)
 	h := d / time.Hour

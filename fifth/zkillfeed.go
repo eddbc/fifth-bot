@@ -125,7 +125,7 @@ func processKill(kill Kill) {
 			msg = fmt.Sprintf("%v isn't completely useless.\n", name)
 		}
 	} else if isExpsv { // kill is expensive
-		msg = fmt.Sprintf("%v worth %v ISK died!", kill.Victim.ShipTypeName, isk.NearestThousandFormat(kill.Zkb.TotalValue))
+		//msg = fmt.Sprintf("%v worth %v ISK died!\n", kill.Victim.ShipTypeName, isk.NearestThousandFormat(kill.Zkb.TotalValue))
 	}
 
 	// put zKill link in message

@@ -18,6 +18,7 @@ import (
 	"github.com/gregjones/httpcache"
 
 	"github.com/eddbc/fifth-bot/fifth"
+	"github.com/eddbc/fifth-bot/sso"
 	_ "github.com/joho/godotenv/autoload"
 )
 
@@ -49,6 +50,7 @@ func init() {
 	transport := httpcache.NewTransport(httpcache.NewMemoryCache())
 	transport.Transport = &http.Transport{Proxy: http.ProxyFromEnvironment}
 	httpClient := &http.Client{Transport: transport}
+	sso.Client = httpClient
 
 	// Get our API Client.
 	esiClient := goesi.NewAPIClient(httpClient, useragent)
@@ -112,6 +114,8 @@ ___________.__  _____  __  .__   __________        __
 
 	// Open ZKill websocket for new killmails
 	go fifth.ListenZKill()
+
+	go sso.Load(eveSSOId, eveSSOKey)
 
 	// Wait for a CTRL-C
 	log.Printf(`Now running. Press CTRL-C to exit.`)
