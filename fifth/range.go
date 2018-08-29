@@ -17,7 +17,7 @@ func (f *Fifth) Range(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Con
 	strings := []string{"solar_system"}
 	res, _, err := Eve.SearchApi.GetSearch(context.Background(), strings, ctx.Fields[1], nil)
 	if err != nil {
-		log.Println("Error searching for system: %v", err)
+		log.Printf("Error searching for system: %v", err)
 		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("<@%v> Error searching for system", dm.Author.ID))
 		return
 	}
