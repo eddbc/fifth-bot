@@ -27,7 +27,7 @@ func getKill() (Kill, error) {
 
 func TestInterestingKill(t *testing.T) {
 
-	entitiesOfInterest = []int{
+	entitiesOfInterest = []int32{
 		1354830081, // goons
 		99005338,   // horde
 		98481691,   // nogrl
