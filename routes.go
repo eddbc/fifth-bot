@@ -28,6 +28,7 @@ func routes() {
 	Router.Route("status", "Get EVE Tranquility server status", f.Status)
 	Router.Route("time", "Get current EVE time, or time until a given EVE time (eg. ~time 20:00)", f.EveTime)
 	Router.Route("who", "Get info about an EVE character", f.Who)
+	Router.Route("range", "Get ranges for various ship types from a given system", f.Range)
 	if debug {
 		Router.Route("servers", "", f.Servers)
 		Router.Route("caps", "Search public contracts in a region for capitals", f.SearchCapitalContracts)

@@ -47,7 +47,7 @@ func (f *Fifth) EveTime(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.C
 	etStr := et.Format("15:04")
 
 	if len(ctx.Fields) == 1 {
-		_, _ = ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Current EVE Time: **%v**\n", etStr))
+		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Current EVE Time: **%v**\n", etStr))
 	} else {
 		dd := et.Format("2006/01/02")
 		tt := ctx.Fields[1]
@@ -58,7 +58,7 @@ func (f *Fifth) EveTime(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.C
 
 		log.Printf("target time %v for input %v", target, ctx.Fields[1])
 		timeTil := target.Sub(et)
-		_, _ = ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Time until %v EVE: **%v**. You should probably learn simple maths and figure it out yourself though.\n(Current EVE Time: %v)", target.Format("15:04"), fmtDuration(timeTil), etStr))
+		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Time until %v EVE: **%v**. You should probably learn simple maths and figure it out yourself though.\n(Current EVE Time: %v)", target.Format("15:04"), fmtDuration(timeTil), etStr))
 	}
 
 }
