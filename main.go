@@ -78,6 +78,8 @@ ___________.__  _____  __  .__   __________        __
  \___  /   |__||__|   |__| |___|  /______  /\____/|__|  
      \/                         \/       \/  %-16s`+"\n\n", Version)
 
+	log.Printf(`Starting...`)
+
 	// Parse command line arguments
 	flag.Parse()
 
@@ -118,7 +120,7 @@ ___________.__  _____  __  .__   __________        __
 	go sso.Load(eveSSOId, eveSSOKey)
 
 	// Wait for a CTRL-C
-	log.Printf(`Now running. Press CTRL-C to exit.`)
+	log.Printf(`Discord bot running`)
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc

@@ -31,6 +31,7 @@ func Load(id string, key string) {
 	})
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/callback", callbackHandler)
+	log.Printf(`SSO server running`)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
@@ -82,12 +83,16 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//token.
+
 	// Obtain a token source (automaticlly pulls refresh as needed)
 	tokSrc, err := SSOAuthenticator.TokenSource(token)
 	if err != nil {
 		return
 		//return http.StatusInternalServerError, err
 	}
+
+	tokSrc.Token()
 
 	// Assign an auth context to the calls
 	//auth := context.WithValue(context.TODO(), goesi.ContextOAuth2, tokSrc.Token)

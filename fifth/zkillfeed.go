@@ -31,7 +31,7 @@ func ListenZKill() {
 		log.Fatal("subscribe:", err)
 	}
 
-	log.Printf("listening to zkill")
+	log.Printf("zKillboard feed running")
 
 	done := make(chan struct{})
 
