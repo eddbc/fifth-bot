@@ -88,6 +88,21 @@ func (f *Fifth) Who(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Conte
 	}
 }
 
+func (f *Fifth) SetStatus(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
+	status := ""
+
+	for k, v := range ctx.Fields {
+		if k != 0 {
+			status += v
+			if k < len(ctx.Fields) {
+				status += " "
+			}
+		}
+	}
+
+	ds.UpdateStatus(0, status)
+}
+
 func (f *Fifth) Servers(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 	msg := fmt.Sprintf("**Connected to %v servers :**", len(Session.State.Guilds))
 	for _, guild := range ds.State.Guilds {

@@ -109,7 +109,7 @@ ___________.__  _____  __  .__   __________        __
 		os.Exit(1)
 	}
 
-	Session.UpdateStatus(0, "Rainbow 6 Siege")
+	Session.UpdateStatus(0, "EVE Online 2 (Beta)")
 
 	fifth.Session = Session
 	fifth.Debug = debug

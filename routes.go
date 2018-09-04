@@ -26,6 +26,7 @@ func routes() {
 	Router.Route("help", "Display this message", Router.Help)
 
 	Router.Route("status", "Get EVE Tranquility server status", f.Status)
+	Router.Route("setstatus", "Set 'Playing' status", f.SetStatus)
 	Router.Route("time", "Get current EVE time, or time until a given EVE time (eg. ~time 20:00)", f.EveTime)
 	Router.Route("who", "Get info about an EVE character", f.Who)
 	Router.Route("range", "Get ranges for various ship types from a given system", f.Range)
