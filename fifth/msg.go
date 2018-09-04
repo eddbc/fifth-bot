@@ -3,8 +3,8 @@ package fifth
 import "log"
 
 var debugChannel = "459341365562572803"     // testing-lab
-var spamChannel = "459997163787649025"      // pit of dispair
-var importantChannel = "484157249141604353" // general
+var importantChannel = "485560181732802578" // general
+var spamChannel = "485560181732802578"      // also general
 
 func SendMsg(msg string) {
 	SendMsgToChan(spamChannel, msg)
