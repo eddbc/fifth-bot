@@ -13,7 +13,7 @@ import (
 var entitiesOfInterest = []int32{
 	//1354830081, // goons
 	//99005338,	// horde
-	98481691, // nogrl
+	//98481691, // nogrl
 	98408504, // txfoz
 }
 
