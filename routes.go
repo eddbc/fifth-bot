@@ -33,12 +33,13 @@ func routes() {
 	if debug {
 		Router.Route("servers", "", f.Servers)
 		Router.Route("caps", "Search public contracts in a region for capitals", f.SearchCapitalContracts)
+		//Router.Route("leave", "", f.Leave)
 	}
 
 	Session.AddHandlerOnce(connectedMsg)
 }
 
-func connectedMsg(ds *discordgo.Session, _ *discordgo.PresenceUpdate) {
+func connectedMsg(ds *discordgo.Session, _ *discordgo.TypingStart) {
 	log.Printf("Connected to %v servers :", len(Session.State.Guilds))
 	for _, server := range ds.State.Guilds {
 		log.Printf("%v - (%v)", server.Name, server.ID)

@@ -88,6 +88,12 @@ func (f *Fifth) Who(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Conte
 	}
 }
 
+//func (f *Fifth) Leave(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
+//	ds.GuildLeave("369532093631299584") // NOGRL
+//	ds.GuildLeave("484121182363189248") // Sholupen
+//	ds.ChannelMessageSend(dm.ChannelID, "Left Servers: NOGRL and Sholupen")
+//}
+
 func (f *Fifth) SetStatus(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 	status := ""
 
