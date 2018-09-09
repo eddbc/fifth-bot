@@ -13,7 +13,7 @@ import (
 var entitiesOfInterest = []int32{
 	//1354830081, // goons
 	//99005338,	// horde
-	98481691, // nogrl
+	//98481691, // nogrl
 	98408504, // txfoz
 }
 
@@ -126,7 +126,7 @@ func processKill(kill Kill) {
 			msg = fmt.Sprintf("%v isn't completely useless.\n", name)
 		}
 	} else if isExpsv { // kill is expensive
-		//msg = fmt.Sprintf("%v worth %v ISK died!\n", kill.Victim.ShipTypeName, isk.NearestThousandFormat(kill.Zkb.TotalValue))
+		important = true
 	}
 
 	// put zKill link in message
