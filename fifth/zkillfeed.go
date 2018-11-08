@@ -62,6 +62,7 @@ func processKill(kill Kill) {
 	important := false
 	msg := ""
 	value := kill.Zkb.TotalValue
+	react := false
 
 	// ignore all kills under 1M, to reduce spam
 	if value < 1000000 {
@@ -111,7 +112,8 @@ func processKill(kill Kill) {
 
 	if isLoss { // ship lost by entity of interest
 		msg = fmt.Sprintf("%v is a disgusting feeder\n", kill.Victim.CharacterName)
-		if value > 500000000 {
+		react = true
+		if value > 100000000 {
 			important = true
 		}
 	} else if isKill { // ship killed by entity of interest
@@ -136,15 +138,15 @@ func processKill(kill Kill) {
 		kill.RegionName, kill.Zkb.url)
 
 	// send message to appropriate channels
+	f := SendMsg
 	if important {
-		m, err := SendImportantMsg(msg)
-		if err == nil {
-			Session.MessageReactionAdd(m.ChannelID, m.ID, "509447602291605519")
-		}
-	} else {
-		SendMsg(msg)
+		f = SendImportantMsg
 	}
 
+	m, err := f(msg)
+	if err == nil && react {
+		Session.MessageReactionAdd(m.ChannelID, m.ID, ":rip:486665154356969496")
+	}
 }
 
 func isExpensive(km Kill) bool {

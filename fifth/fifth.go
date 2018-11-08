@@ -79,15 +79,7 @@ func (f *Fifth) Who(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Conte
 	embed, err := getCharacterInfoEmbed(name)
 
 	if err == nil {
-		m, err := ds.ChannelMessageSendEmbed(dm.ChannelID, embed)
-		if err != nil {
-			log.Printf("error: %+v", err)
-		}
-		c, _ := Session.Channel(m.ChannelID)
-		g := c.GuildID
-		e, _ := Session.State.Emoji(g, "509888896751108126")
-		log.Println(e.ID)
-		err = Session.MessageReactionAdd(m.ChannelID, m.ID, e.ID)
+		_, err := ds.ChannelMessageSendEmbed(dm.ChannelID, embed)
 		if err != nil {
 			log.Printf("error: %+v", err)
 		}
@@ -95,12 +87,6 @@ func (f *Fifth) Who(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Conte
 		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Error :warning: %s\n", err))
 	}
 }
-
-//func (f *Fifth) Leave(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
-//	ds.GuildLeave("369532093631299584") // NOGRL
-//	ds.GuildLeave("484121182363189248") // Sholupen
-//	ds.ChannelMessageSend(dm.ChannelID, "Left Servers: NOGRL and Sholupen")
-//}
 
 func (f *Fifth) SetStatus(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 	status := ""
@@ -124,6 +110,15 @@ func (f *Fifth) Servers(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.C
 	}
 	m, _ := SendDebugMsg(msg)
 	Session.MessageReactionAdd(m.ChannelID, m.ID, "509447602291605519")
+}
+
+func (f *Fifth) Test(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
+	m, _ := SendMsgToChan(dm.ChannelID, "reaction test")
+	err := Session.MessageReactionAdd(m.ChannelID, m.ID, ":rip:486665154356969496")
+
+	if err != nil {
+		log.Printf("error: %+v", err)
+	}
 }
 
 func fmtDuration(d time.Duration) string {
