@@ -1,34 +1,34 @@
 package fifth
 
-import "log"
+import (
+	"github.com/bwmarrin/discordgo"
+	"log"
+)
 
 var debugChannel = "459341365562572803"     // testing-lab
 var importantChannel = "486808823110303754" // general
 var spamChannel = "488473067505319938"      // kill-feed
 
-func SendMsg(msg string) {
-	SendMsgToChan(spamChannel, msg)
+func SendMsg(msg string) (*discordgo.Message, error) {
+	return SendMsgToChan(spamChannel, msg)
 }
 
-func SendImportantMsg(msg string) {
-	SendMsgToChan(importantChannel, msg)
+func SendImportantMsg(msg string) (*discordgo.Message, error) {
+	return SendMsgToChan(importantChannel, msg)
 }
 
-func SendDebugMsg(msg string) {
-	Session.ChannelMessageSend(debugChannel, msg)
+func SendDebugMsg(msg string) (*discordgo.Message, error) {
+	return Session.ChannelMessageSend(debugChannel, msg)
 }
 
-func SendMsgToChan(chann string, msg string) {
+func SendMsgToChan(chann string, msg string) (*discordgo.Message, error) {
 	log.Println(msg)
-	if !Debug {
-		_, err := Session.ChannelMessageSend(chann, msg)
-		if err != nil {
-			log.Println(err)
-		}
-	} else {
-		_, err := Session.ChannelMessageSend(debugChannel, msg)
-		if err != nil {
-			log.Println(err)
-		}
+	if Debug {
+		chann = debugChannel
 	}
+	m, err := Session.ChannelMessageSend(chann, msg)
+	if err != nil {
+		log.Println(err)
+	}
+	return m,err
 }

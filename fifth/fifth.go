@@ -79,7 +79,15 @@ func (f *Fifth) Who(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Conte
 	embed, err := getCharacterInfoEmbed(name)
 
 	if err == nil {
-		_, err := ds.ChannelMessageSendEmbed(dm.ChannelID, embed)
+		m, err := ds.ChannelMessageSendEmbed(dm.ChannelID, embed)
+		if err != nil {
+			log.Printf("error: %+v", err)
+		}
+		c, _ := Session.Channel(m.ChannelID)
+		g := c.GuildID
+		e, _ := Session.State.Emoji(g, "509888896751108126")
+		log.Println(e.ID)
+		err = Session.MessageReactionAdd(m.ChannelID, m.ID, e.ID)
 		if err != nil {
 			log.Printf("error: %+v", err)
 		}
@@ -114,7 +122,8 @@ func (f *Fifth) Servers(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.C
 	for _, guild := range ds.State.Guilds {
 		msg = fmt.Sprintf("%v\n * %v - (%v)", msg, guild.Name, guild.ID)
 	}
-	SendDebugMsg(msg)
+	m, _ := SendDebugMsg(msg)
+	Session.MessageReactionAdd(m.ChannelID, m.ID, "509447602291605519")
 }
 
 func fmtDuration(d time.Duration) string {

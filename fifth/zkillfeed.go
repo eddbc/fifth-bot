@@ -137,7 +137,10 @@ func processKill(kill Kill) {
 
 	// send message to appropriate channels
 	if important {
-		SendImportantMsg(msg)
+		m, err := SendImportantMsg(msg)
+		if err == nil {
+			Session.MessageReactionAdd(m.ChannelID, m.ID, "509447602291605519")
+		}
 	} else {
 		SendMsg(msg)
 	}
