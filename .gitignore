@@ -2,3 +2,4 @@
 /fifth-bot*
 /.env
 deploy.sh
+*.db

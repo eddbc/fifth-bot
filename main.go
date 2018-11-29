@@ -17,6 +17,8 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/gregjones/httpcache"
 
+	bolt "go.etcd.io/bbolt"
+
 	"github.com/eddbc/fifth-bot/fifth"
 	"github.com/eddbc/fifth-bot/sso"
 	_ "github.com/joho/godotenv/autoload"
@@ -90,6 +92,15 @@ ___________.__  _____  __  .__   __________        __
 	// Load defined command routes
 	routes()
 
+	// Open the fifth.db data file in current directory.
+	// It will be created if it doesn't exist.
+	log.Printf(`Initialising storage...`)
+	db, err := bolt.Open("fifth.db", 0600, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
 	// Verify a Token was provided
 	if Session.Token == "" {
 		log.Println("You must provide a Discord authentication token.")
@@ -109,10 +120,13 @@ ___________.__  _____  __  .__   __________        __
 		os.Exit(1)
 	}
 
-	Session.UpdateStatus(0, "EVE Online 2 (Beta)")
+	Session.UpdateStatus(0, "Bot Development")
 
 	fifth.Session = Session
 	fifth.Debug = debug
+	fifth.DB = db
+
+	fifth.DBInit()
 
 	// Open ZKill websocket for new killmails
 	go fifth.ListenZKill()

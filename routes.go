@@ -32,6 +32,7 @@ func routes() {
 	Router.Route("range", "Get ranges for various ship types from a given system", f.Range)
 	if debug {
 		Router.Route("test", "", f.Test)
+		Router.Route("db", "", f.StorageTest)
 		Router.Route("servers", "", f.Servers)
 		Router.Route("caps", "Search public contracts in a region for capitals", f.SearchCapitalContracts)
 	}
