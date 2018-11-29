@@ -13,9 +13,16 @@ import (
 )
 
 type Timer struct {
-	ID int `json:"id"`
-	Time  time.Time `json:"time"`
-	Description string `json:"description"`
+	ID          int       `json:"id"`
+	Time        time.Time `json:"time"`
+	Description string    `json:"description"`
+	Pinged      bool      `json:"pinged"`
+}
+
+func (t *Timer) toStr() string {
+	loc, _ := time.LoadLocation("Atlantic/Reykjavik")
+	_, _, d, h, m, _ := diff(time.Now().In(loc), t.Time)
+	return fmt.Sprintf("%v - %v (%vd %vh %vm) [%v]",t.Description, t.Time.Format("Jan 2, 15:04"), d, h, m, t.ID)
 }
 
 func (f *Fifth) AddTimer(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
@@ -64,7 +71,7 @@ func (f *Fifth) AddTimer(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.
 	log.Println(s)
 	ds.ChannelMessageSend(dm.ChannelID, s)
 
-	saveTimer(Timer{Time:then, Description:desc})
+	saveTimer(Timer{Time:then, Description:desc, Pinged:false})
 }
 
 func (f *Fifth) ListTimers(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
@@ -83,18 +90,17 @@ func (f *Fifth) ListTimers(ds *discordgo.Session, dm *discordgo.Message, ctx *mu
 	})
 
 	resp := "```\n"
-	loc, _ := time.LoadLocation("Atlantic/Reykjavik")
 	if len(timers) == 0 {
 		resp += "No Timers"
 	}
 	for _, timer := range timers {
-		_, _, d, h, m, _ := diff(time.Now().In(loc), timer.Time)
-		resp += fmt.Sprintf("%v (%vd %vh %vm) [%v]\n",timer.Description, d, h, m, timer.ID)
+		resp += timer.toStr()+"\n"
 	}
 	resp += "```"
 	log.Println(resp)
 	ds.ChannelMessageSend(dm.ChannelID, resp)
 }
+
 func (f *Fifth) RemoveTimer(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 
 	i, err := strconv.Atoi(ctx.Fields[1])
@@ -106,6 +112,39 @@ func (f *Fifth) RemoveTimer(ds *discordgo.Session, dm *discordgo.Message, ctx *m
 	storage.DB.Update(func(tx *bbolt.Tx) error {
 		b := tx.Bucket([]byte(storage.TimersKey))
 		b.Delete(storage.Itob(i))
+		return nil
+	})
+}
+
+func timerCron(){
+	storage.DB.Update(func(tx *bbolt.Tx) error {
+		// Assume bucket exists and has keys
+		b := tx.Bucket([]byte(storage.TimersKey))
+
+		b.ForEach(func(k, v []byte) error {
+			timer := Timer{}
+			json.Unmarshal(v, &timer)
+
+			if !timer.Pinged {
+				then := time.Now().Add(30 * time.Minute)
+				log.Println(then)
+				log.Println(timer.Time)
+				if timer.Time.Before(then) {
+					SendImportantMsg("@here Timer Warning : "+timer.toStr())
+					timer.Pinged = true
+					bytes, err := json.Marshal(timer)
+					if err == nil {
+						b.Put(k, bytes)
+					}
+				}
+			}
+
+			if timer.Time.Before(time.Now()) {
+				log.Printf("Timer has expired, deleting : < %v >", timer.toStr())
+				b.Delete(k)
+			}
+			return nil
+		})
 		return nil
 	})
 }

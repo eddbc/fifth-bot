@@ -31,7 +31,7 @@ func routes() {
 	Router.Route("who", "Get info about an EVE character", f.Who)
 	Router.Route("range", "Get ranges for various ship types from a given system", f.Range)
 	Router.Route("timer", "Add a timer with format: \"!timer 2d 6h 15m description and location goes here\"", f.AddTimer)
-	Router.Route("timers", "List Timers with format \"description (time remaining) [ID]\"", f.ListTimers)
+	Router.Route("timers", "List Timers with format \"description - date (time left) [ID]\"", f.ListTimers)
 	Router.Route("timer-remove", "Remove a timer with a given ID", f.RemoveTimer)
 	if debug {
 		Router.Route("test", "", f.Test)

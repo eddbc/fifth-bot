@@ -13,6 +13,7 @@ func init() {
 	ctx = context.Background()
 	C = cron.New()
 
+	C.AddFunc("@every 10s", func(){timerCron()})
 	//C.AddFunc("@every 10s", func(){getAllContracts()})
 	//C.AddFunc("0 0 19 * * *", func() { circlejerk() })
 
