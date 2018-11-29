@@ -6,6 +6,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/eddbc/fifth-bot/storage"
 	"log"
 	"net/http"
 	"os"
@@ -120,13 +121,13 @@ ___________.__  _____  __  .__   __________        __
 		os.Exit(1)
 	}
 
-	Session.UpdateStatus(0, "Bot Development")
+	Session.UpdateStatus(0, "Eve Online 2 (Beta)")
 
 	fifth.Session = Session
 	fifth.Debug = debug
-	fifth.DB = db
+	storage.DB = db
 
-	fifth.DBInit()
+	storage.DBInit()
 
 	// Open ZKill websocket for new killmails
 	go fifth.ListenZKill()

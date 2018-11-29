@@ -18,15 +18,6 @@ const useragent = "fifth-bot, edd_reynolds on slack"
 
 type Fifth struct{}
 
-func (f *Fifth) StorageTest(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
-	byteArray, _ := Get("test key")
-	log.Printf("%s", byteArray)
-	//n := bytes.IndexByte(byteArray, 0)
-	//s := string(byteArray[:n])
-	//
-	//SendMsgToChan(dm.ChannelID, s)
-}
-
 func (f *Fifth) Status(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 
 	status, _, err := Eve.StatusApi.GetStatus(context.Background(), nil)

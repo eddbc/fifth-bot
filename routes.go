@@ -26,15 +26,16 @@ func routes() {
 	Router.Route("help", "Display this message", Router.Help)
 
 	Router.Route("tq", "Get EVE Tranquility server status", f.Status)
-	Router.Route("setstatus", "Set 'Playing' status", f.SetStatus)
+	Router.Route("setstatus", "", f.SetStatus)
 	Router.Route("time", "Get current EVE time, or time until a given EVE time (eg. ~time 20:00)", f.EveTime)
 	Router.Route("who", "Get info about an EVE character", f.Who)
 	Router.Route("range", "Get ranges for various ship types from a given system", f.Range)
+	Router.Route("timer", "Add a timer in the following format: \"!timer 2d 6h 15m description and location goes here\"", f.AddTimer)
+	Router.Route("timers", "List Timers", f.ListTimers)
 	if debug {
 		Router.Route("test", "", f.Test)
-		Router.Route("db", "", f.StorageTest)
 		Router.Route("servers", "", f.Servers)
-		Router.Route("caps", "Search public contracts in a region for capitals", f.SearchCapitalContracts)
+		//Router.Route("caps", "Search public contracts in a region for capitals", f.SearchCapitalContracts)
 	}
 
 	Session.AddHandlerOnce(connectedMsg)
