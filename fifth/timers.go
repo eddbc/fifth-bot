@@ -43,7 +43,16 @@ func (f *Fifth) AddTimer(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.
 
 	if d > 8 || h > 23 || m > 59 {
 		log.Println("Invalid Timer")
+		ds.ChannelMessageSend(dm.ChannelID, "Invalid Time Given")
+		return
 	}
+
+	if desc == "" {
+		log.Println("Invalid Timer")
+		ds.ChannelMessageSend(dm.ChannelID, "Invalid Description Given")
+		return
+	}
+
 	loc, _ := time.LoadLocation("Atlantic/Reykjavik")
 
 	then := time.Now().In(loc).Add(
@@ -85,6 +94,20 @@ func (f *Fifth) ListTimers(ds *discordgo.Session, dm *discordgo.Message, ctx *mu
 	resp += "```"
 	log.Println(resp)
 	ds.ChannelMessageSend(dm.ChannelID, resp)
+}
+func (f *Fifth) RemoveTimer(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
+
+	i, err := strconv.Atoi(ctx.Fields[1])
+
+	if err != nil {
+		return
+	}
+
+	storage.DB.Update(func(tx *bbolt.Tx) error {
+		b := tx.Bucket([]byte(storage.TimersKey))
+		b.Delete(storage.Itob(i))
+		return nil
+	})
 }
 
 func saveTimer(t Timer) {
