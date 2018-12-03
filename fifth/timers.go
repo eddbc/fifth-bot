@@ -8,6 +8,7 @@ import (
 	"github.com/eddbc/fifth-bot/storage"
 	"go.etcd.io/bbolt"
 	"log"
+	"sort"
 	"strconv"
 	"time"
 )
@@ -22,29 +23,36 @@ type Timer struct {
 func (t *Timer) toStr() string {
 	loc, _ := time.LoadLocation("Atlantic/Reykjavik")
 	_, _, d, h, m, _ := diff(time.Now().In(loc), t.Time)
-	return fmt.Sprintf("%v - %v (%vd %vh %vm) [%v]",t.Description, t.Time.Format("Jan 2, 15:04"), d, h, m, t.ID)
+	return fmt.Sprintf("%v - %v (%vd %vh %vm) [%v]", t.Description, t.Time.Format("Jan 2, 15:04"), d, h, m, t.ID)
 }
 
 func (f *Fifth) AddTimer(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 	desc := ""
-	d:=0
-	h:=0
-	m:=0
+	d := 0
+	h := 0
+	m := 0
+	var err error = nil
 	for k, v := range ctx.Fields {
 		if k == 1 {
-			d = removeTrailingChar(v)
+			d, err = removeTrailingChar(v)
 		}
 		if k == 2 {
-			h = removeTrailingChar(v)
+			h, err = removeTrailingChar(v)
 		}
 		if k == 3 {
-			m = removeTrailingChar(v)
+			m, err = removeTrailingChar(v)
 		}
 		if k > 3 {
-			desc+=v
+			desc += v
 			if k+1 < len(ctx.Fields) {
 				desc += " "
 			}
+		}
+
+		if err != nil {
+			log.Println("Invalid Timer")
+			ds.ChannelMessageSend(dm.ChannelID, "Invalid Time Given")
+			return
 		}
 	}
 
@@ -63,15 +71,15 @@ func (f *Fifth) AddTimer(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.
 	loc, _ := time.LoadLocation("Atlantic/Reykjavik")
 
 	then := time.Now().In(loc).Add(
-		time.Hour * time.Duration(24*d) +
-		time.Hour* time.Duration(h) +
-		time.Minute * time.Duration(m))
+		time.Hour*time.Duration(24*d) +
+			time.Hour*time.Duration(h) +
+			time.Minute*time.Duration(m))
 
 	s := fmt.Sprintf("Set timer for %v with description \"%s\"", then.Format("Jan 2, 15:04"), desc)
 	log.Println(s)
 	ds.ChannelMessageSend(dm.ChannelID, s)
 
-	saveTimer(Timer{Time:then, Description:desc, Pinged:false})
+	saveTimer(Timer{Time: then, Description: desc, Pinged: false})
 }
 
 func (f *Fifth) ListTimers(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
@@ -89,12 +97,16 @@ func (f *Fifth) ListTimers(ds *discordgo.Session, dm *discordgo.Message, ctx *mu
 		return nil
 	})
 
+	sort.Slice(timers, func(i, j int) bool {
+		return timers[i].Time.Before(timers[j].Time)
+	})
+
 	resp := "```\n"
 	if len(timers) == 0 {
 		resp += "No Timers"
 	}
 	for _, timer := range timers {
-		resp += timer.toStr()+"\n"
+		resp += timer.toStr() + "\n"
 	}
 	resp += "```"
 	log.Println(resp)
@@ -116,7 +128,7 @@ func (f *Fifth) RemoveTimer(ds *discordgo.Session, dm *discordgo.Message, ctx *m
 	})
 }
 
-func timerCron(){
+func timerCron() {
 	storage.DB.Update(func(tx *bbolt.Tx) error {
 		// Assume bucket exists and has keys
 		b := tx.Bucket([]byte(storage.TimersKey))
@@ -130,7 +142,7 @@ func timerCron(){
 				log.Println(then)
 				log.Println(timer.Time)
 				if timer.Time.Before(then) {
-					SendImportantMsg("@here Timer Warning : "+timer.toStr())
+					SendMsgToChan(timerChannel, "@here Timer Warning : "+timer.toStr())
 					timer.Pinged = true
 					bytes, err := json.Marshal(timer)
 					if err == nil {
@@ -166,12 +178,12 @@ func saveTimer(t Timer) {
 	})
 }
 
-func removeTrailingChar(s string) int {
+func removeTrailingChar(s string) (int, error) {
 	if last := len(s) - 1; last >= 0 {
 		s = s[:last]
 	}
-	i, _ := strconv.Atoi(s)
-	return i
+	i, err := strconv.Atoi(s)
+	return i, err
 }
 
 func diff(a, b time.Time) (year, month, day, hour, min, sec int) {
