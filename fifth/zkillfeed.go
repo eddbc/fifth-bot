@@ -49,6 +49,8 @@ func ListenZKill() {
 	}()
 
 	<-done
+
+	log.Fatal("zKill websocket closed")
 }
 
 func logIgnore(reason string) {

@@ -106,7 +106,7 @@ func (f *Fifth) ListTimers(ds *discordgo.Session, dm *discordgo.Message, ctx *mu
 		resp += "No Timers"
 	}
 	for _, timer := range timers {
-		resp += timer.toStr() + "\n"
+		resp += timer.toStr() + "\n\n"
 	}
 	resp += "```"
 	log.Println(resp)
@@ -139,8 +139,6 @@ func timerCron() {
 
 			if !timer.Pinged {
 				then := time.Now().Add(30 * time.Minute)
-				log.Println(then)
-				log.Println(timer.Time)
 				if timer.Time.Before(then) {
 					SendMsgToChan(timerChannel, "@here Timer Warning : "+timer.toStr())
 					timer.Pinged = true
