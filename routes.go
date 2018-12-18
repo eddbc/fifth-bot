@@ -36,7 +36,7 @@ func routes() {
 	if debug {
 		Router.Route("test", "", f.Test)
 		Router.Route("servers", "", f.Servers)
-		//Router.Route("caps", "Search public contracts in a region for capitals", f.SearchCapitalContracts)
+		Router.Route("supers", "Search public contracts in a region for super capitals", f.SearchCapitalContracts)
 	}
 
 	Session.AddHandlerOnce(connectedMsg)

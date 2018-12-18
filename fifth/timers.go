@@ -110,12 +110,14 @@ func (f *Fifth) ListTimers(ds *discordgo.Session, dm *discordgo.Message, ctx *mu
 	}
 	resp += "```"
 	log.Println(resp)
-	ds.ChannelMessageSend(dm.ChannelID, resp)
+	SendMsgToChan(dm.ChannelID, resp)
+	//ds.ChannelMessageSend(dm.ChannelID, resp)
 }
 
 func (f *Fifth) RemoveTimer(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 
 	i, err := strconv.Atoi(ctx.Fields[1])
+	SendMsgToChan(dm.ChannelID, fmt.Sprintf("Deleting timer [%v]...", i))
 
 	if err != nil {
 		return

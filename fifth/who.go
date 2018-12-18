@@ -16,7 +16,7 @@ import (
 
 var supers = []string{"Hel", "Aeon", "Wyvern", "Nyx", "Vendetta", "Revenant", "Avatar", "Erebus", "Leviathan", "Ragnarok", "Molok", "Vanquisher", "Komodo"}
 var caps = []string{"Apostle", "Lif", "Ninazu", "Minokawa", "Chimera", "Archon", "Thanatos", "Nidhoggur", "Moros", "Phoenix", "Naglfar", "Revelation", "Vehement"}
-var fittedSlots = []int{27, 34, 19, 26, 11, 118, 87, 92, 98, 125, 132}
+var fittedSlots = []int32{27, 34, 19, 26, 11, 118, 87, 92, 98, 125, 132}
 
 func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 
@@ -178,13 +178,16 @@ func isCynoChar(characterID int32) (cyno string, err error) {
 	var cynoLoss int32 = 0
 	json.Unmarshal(body, &kills)
 
-	for _, kill := range kills {
-		for _, item := range kill.Victim.Items {
-			if item.ItemTypeID == 21096 || item.ItemTypeID == 28646 {
-				for _, slot := range fittedSlots {
-					if item.Flag == slot {
-						if cynoLoss == 0 {
-							cynoLoss = kill.KillmailID
+	for _, k := range kills {
+		kill, _, err := Eve.KillmailsApi.GetKillmailsKillmailIdKillmailHash(ctx, k.Zkb.Hash, k.KillmailID, nil)
+		if err == nil {
+			for _, item := range kill.Victim.Items {
+				if item.ItemTypeId == 21096 || item.ItemTypeId == 28646 {
+					for _, slot := range fittedSlots {
+						if item.Flag == slot {
+							if cynoLoss == 0 {
+								cynoLoss = kill.KillmailId
+							}
 						}
 					}
 				}
