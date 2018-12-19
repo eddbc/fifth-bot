@@ -10,11 +10,7 @@ import (
 	"strconv"
 	"sync"
 )
-var types = []int32{
-	30, // Titan
-	659, // Supercarrier
-	//485, // Dread
-}
+
 func (f *Fifth) SearchCapitalContracts(ds *discordgo.Session, dm *discordgo.Message, muxCtx *mux.Context) {
 	rgnStr := ""
 	for k, v := range muxCtx.Fields {
@@ -99,7 +95,7 @@ func getContractsForRegion(regionId int32) (expCon []esi.GetContractsPublicRegio
 						if err != nil {
 							return expCon, err
 						}
-						for _, v := range types {
+						for _, v := range superTypes {
 							if t.GroupId == v {
 								expCon = append(expCon, c)
 							}

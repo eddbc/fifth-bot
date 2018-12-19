@@ -7,14 +7,28 @@ import (
 	"github.com/eddbc/fifth-bot/isk"
 	"github.com/gorilla/websocket"
 	"log"
+	"math"
 	"time"
 )
+
+var superTypes = []int32{
+	30, // Titan
+	659, // Supercarrier
+}
+
+var capTypes = []int32 {
+	485, // Dread
+}
 
 var entitiesOfInterest = []int32{
 	//1354830081, // goons
 	//99005338,	// horde
 	//98481691, // nogrl
 	98408504, // txfoz
+}
+
+var stagingSystems = []int32{
+	30000974, // H-8F5Q
 }
 
 func ListenZKill() {
@@ -86,6 +100,7 @@ func processKill(kill Kill) {
 
 	// get filtering criteria
 	isExpsv := isExpensive(kill)
+	isNearbyCap := isNearbyCap(kill)
 	isKill, isLoss, err := isEntityRelated(kill)
 	if err != nil {
 		return
@@ -131,6 +146,9 @@ func processKill(kill Kill) {
 		}
 	} else if isExpsv { // kill is expensive
 		important = true
+	} else if isNearbyCap {
+		important = true
+		msg = fmt.Sprintf("@here Capital activity in range!\n")
 	}
 
 	// put zKill link in message
@@ -149,6 +167,51 @@ func processKill(kill Kill) {
 	if err == nil && react {
 		Session.MessageReactionAdd(m.ChannelID, m.ID, ":rip:486665154356969496")
 	}
+}
+
+func isNearbyCap(km Kill) bool {
+	isCap := false
+	isNearby := false
+
+	sys, _, err := Eve.UniverseApi.GetUniverseSystemsSystemId(ctx, km.SolarSystemID, nil)
+	if err != nil {
+		return false
+	}
+	sys.Position.
+
+	if(isNearby){
+		for _, attacker := range km.Attackers {
+			t, _, err := Eve.UniverseApi.GetUniverseTypesTypeId(ctx, attacker.ShipTypeID, nil)
+			if err != nil {
+				return false
+			}
+			for _, capId := range capTypes {
+				if t.GroupId == capId {
+					isCap = true
+				}
+			}
+			for _, superId := range superTypes {
+				if t.GroupId == superId {
+					isCap = true
+				}
+			}
+		}
+	}
+
+	return isCap && isNearby
+}
+type xyz struct {
+	x float64
+	y float64
+	z float64
+	
+}
+func distanceBetweenSystems(a xyz, b xyz) float64 {
+	x := math.Pow(b.x - a.x, 2)
+	y := math.Pow(b.y - a.y, 2)
+	z := math.Pow(b.z - a.z, 2)
+	return math.Pow(x + y + z, 0.5)
+
 }
 
 func isExpensive(km Kill) bool {
