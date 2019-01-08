@@ -1,21 +1,8 @@
 package fifth
 
 import (
-	"github.com/antihax/goesi"
-	"github.com/gregjones/httpcache"
-	"net/http"
 	"testing"
 )
-
-func init() {
-	transport := httpcache.NewTransport(httpcache.NewMemoryCache())
-	transport.Transport = &http.Transport{Proxy: http.ProxyFromEnvironment}
-	client := &http.Client{Transport: transport}
-
-	// Get our API Client.
-	esiClient := goesi.NewAPIClient(client, useragent)
-	Eve = esiClient.ESI
-}
 
 func TestWhoCommand(t *testing.T) {
 
@@ -42,11 +29,11 @@ func TestWhoCommand(t *testing.T) {
 		t.Error("Name does not match expected value")
 	}
 
-	if corp != "Girls Lie But Zkill Doesn't" {
+	if corp != "Bad Game Design" {
 		t.Error("Corp does not match expected value")
 	}
 
-	if alli != "Pandemic Legion" {
+	if alli != "skill urself" {
 		t.Error("Alliance does not match expected value")
 	}
 }

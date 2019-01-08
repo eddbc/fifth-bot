@@ -9,7 +9,7 @@ import (
 
 func getKill() (Kill, error) {
 	var kill Kill
-	r, err := http.Get("https://zkillboard.com/api/killID/72019508/")
+	r, err := http.Get("https://esi.evetech.net/latest/killmails/72019508/1c768cdb3e5e8eb5a7d7dd12192fe8a7fa83a4d6/")
 	if err != nil {
 		return kill, err
 	}
@@ -17,12 +17,25 @@ func getKill() (Kill, error) {
 	defer r.Body.Close()
 	body, err := ioutil.ReadAll(r.Body)
 
-	var j []Kill
-	json.Unmarshal(body, &j)
+	//var kill Kill
+	json.Unmarshal(body, &kill)
 
-	kill = j[0]
+	//kill = j[0]
 
 	return kill, err
+}
+
+func TestSystemRange(t *testing.T) {
+	var h8 int32 = 30000974
+	var e02 int32 = 30000903
+
+	d, err := distanceBetweenSystems(h8, e02)
+	if err != nil {
+		t.FailNow()
+	}
+	if d != 2.073 {
+		t.Errorf("Distance 1 was %v, not 2.073", d)
+	}
 }
 
 func TestInterestingKill(t *testing.T) {
@@ -30,7 +43,6 @@ func TestInterestingKill(t *testing.T) {
 	entitiesOfInterest = []int32{
 		1354830081, // goons
 		99005338,   // horde
-		98481691,   // nogrl
 	}
 
 	kill, err := getKill()

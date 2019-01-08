@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/antihax/goesi/esi"
 	"github.com/eddbc/fifth-bot/isk"
 	"github.com/gorilla/websocket"
 	"log"
@@ -25,7 +24,6 @@ var capTypes = []int32{
 
 var entitiesOfInterest = []int32{
 	98408504, // txfoz
-	//98481691, // nogrl
 	//1354830081, // goons
 	//99005338,	// horde
 }
@@ -72,7 +70,7 @@ func ListenZKill() {
 
 func logIgnore(reason string) {
 	if Debug {
-		//log.Printf("ignoring kill. reason: %v\n", reason)
+		log.Printf("ignoring kill. reason: %v\n", reason)
 	}
 }
 
@@ -176,15 +174,9 @@ func isNearbyCap(km Kill) bool {
 	isCap := false
 	isNearby := false
 
-	sys, _, err := Eve.UniverseApi.GetUniverseSystemsSystemId(ctx, km.SolarSystemID, nil)
-	if err != nil {
-		return false
-	}
-
 	for _, stagingId := range stagingSystems {
-		staging, _, err := Eve.UniverseApi.GetUniverseSystemsSystemId(ctx, stagingId, nil)
+		distance, err := distanceBetweenSystems(stagingId, km.SolarSystemID)
 		if err == nil {
-			distance := distanceBetweenSystems(staging, sys)
 			if distance < 8 {
 				isNearby = true
 			}
@@ -219,12 +211,25 @@ type xyz struct {
 	z float64
 }
 
-func distanceBetweenSystems(a esi.GetUniverseSystemsSystemIdOk, b esi.GetUniverseSystemsSystemIdOk) float64 {
-	distance := distanceBetweenPoints(
+func distanceBetweenSystems(idA int32, idB int32) (distance float64, err error) {
+
+	a, _, err := Eve.UniverseApi.GetUniverseSystemsSystemId(ctx, idA, nil)
+	if err != nil {
+		return
+	}
+
+	b, _, err := Eve.UniverseApi.GetUniverseSystemsSystemId(ctx, idB, nil)
+	if err != nil {
+		return
+	}
+
+	distance = distanceBetweenPoints(
 		xyz{a.Position.X, a.Position.Y, a.Position.Z},
 		xyz{b.Position.X, b.Position.Y, b.Position.Z},
 	)
-	return distance / 9460730472580800 // convert from Meters to LY
+	distance = distance / 9460730472580800      // convert from Meters to LY
+	distance = math.Round(distance*1000) / 1000 // round to 3dp
+	return
 }
 
 func distanceBetweenPoints(a xyz, b xyz) float64 {
