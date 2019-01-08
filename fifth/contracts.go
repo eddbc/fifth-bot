@@ -55,12 +55,12 @@ func getAllContracts() {
 	}
 
 	var wg sync.WaitGroup
-	contractChannel := make (chan []esi.GetContractsPublicRegionId200Ok)
+	contractChannel := make(chan []esi.GetContractsPublicRegionId200Ok)
 	for _, regionId := range regions {
 		wg.Add(1)
 		go func(regionId int32) {
 			defer wg.Done()
-			regionContracts, err :=getContractsForRegion(regionId)
+			regionContracts, err := getContractsForRegion(regionId)
 			if err != nil {
 				log.Fatal(err)
 			} else {

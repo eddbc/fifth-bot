@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/antihax/goesi/esi"
 	"github.com/bwmarrin/discordgo"
+	"github.com/eddbc/fifth-bot/esiStatus"
 	"github.com/eddbc/fifth-bot/mux"
 	"log"
 	"time"
@@ -20,6 +21,8 @@ type Fifth struct{}
 
 func (f *Fifth) Status(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 
+	msg := ""
+
 	status, _, err := Eve.StatusApi.GetStatus(context.Background(), nil)
 
 	if err != nil {
@@ -28,15 +31,32 @@ func (f *Fifth) Status(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Co
 		return
 	}
 
-	if status.Vip {
-		_, err = ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Server is in VIP Mode! Current Players: %d\n", status.Players))
+	if status.Vip && status.Players == 0 {
+		msg = fmt.Sprintf("TQ is offline :(\n")
+	} else if status.Vip {
+		msg = fmt.Sprintf("TQ is in VIP Mode. Current Players: %d\n", status.Players)
 	} else {
-		_, err = ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Disgusting subhumans currently on TQ: %d\n", status.Players))
+		msg = fmt.Sprintf("Disgusting subhumans currently on TQ: %d\n", status.Players)
 	}
 
+	g, y, r, err := esiStatus.GetEsiStatus()
 	if err != nil {
-		log.Printf("error sending message, %s\n", err)
+		msg = fmt.Sprintf("%vError getting ESI status\n", msg)
+	} else {
+		if r > 0 || g < 150 {
+			msg = fmt.Sprintf("%v:warning: **ESI is reporting errors** :warning:", msg)
+		} else if y > 0 {
+			msg = fmt.Sprintf("%v*ESI is reporting minor issues*", msg)
+		} else {
+			msg = fmt.Sprintf("%vESI is :ok_hand:", msg)
+		}
+
+		if r > 0 || y > 0 {
+			msg = fmt.Sprintf("%v\n(%v :white_check_mark:,  %v :warning:,  %v :broken_heart:)\n", msg, g, y, r)
+		}
 	}
+
+	_, err = ds.ChannelMessageSend(dm.ChannelID, msg)
 }
 
 func (f *Fifth) EveTime(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {

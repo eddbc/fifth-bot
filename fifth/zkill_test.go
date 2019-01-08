@@ -17,7 +17,6 @@ func getKill() (Kill, error) {
 	defer r.Body.Close()
 	body, err := ioutil.ReadAll(r.Body)
 
-	//var kill Kill
 	json.Unmarshal(body, &kill)
 
 	//kill = j[0]
@@ -51,7 +50,7 @@ func TestInterestingKill(t *testing.T) {
 		return
 	}
 
-	isKill, isLoss, err := isEntityRelated(kill)
+	isKill, isLoss, err := isEntityRelated(&kill)
 	if err != nil {
 		t.FailNow()
 		return
