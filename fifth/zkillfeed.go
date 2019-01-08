@@ -23,9 +23,20 @@ var capTypes = []int32{
 }
 
 var entitiesOfInterest = []int32{
+
+	// Corps
 	98408504, // txfoz
+	//98537880, // IGN0R (aldent alt corp)
+
+	// Characters
+	95453757, // Frankie Reynolds
+	//2112892461, // Twinings Denniard
+	//2113824199, // Zero Zero Two
+
+	// Testing Groups
 	//1354830081, // goons
 	//99005338,	// horde
+	//498125261, // test
 }
 
 var stagingSystems = []int32{
@@ -59,7 +70,7 @@ func ListenZKill() {
 			if err != nil {
 				log.Fatal("websocket read: ", err)
 			}
-			processKill(kill)
+			processKill(&kill)
 		}
 	}()
 
@@ -70,11 +81,11 @@ func ListenZKill() {
 
 func logIgnore(reason string) {
 	if Debug {
-		log.Printf("ignoring kill. reason: %v\n", reason)
+		//log.Printf("ignoring kill. reason: %v\n", reason)
 	}
 }
 
-func processKill(kill Kill) {
+func processKill(kill *Kill) {
 
 	important := false
 	msg := ""
@@ -170,7 +181,7 @@ func processKill(kill Kill) {
 	}
 }
 
-func isNearbyCap(km Kill) bool {
+func isNearbyCap(km *Kill) bool {
 	isCap := false
 	isNearby := false
 
@@ -239,12 +250,12 @@ func distanceBetweenPoints(a xyz, b xyz) float64 {
 	return math.Pow(x+y+z, 0.5)
 }
 
-func isExpensive(km Kill) bool {
+func isExpensive(km *Kill) bool {
 	expsvLimit := float64(15000000000)
 	return km.Zkb.TotalValue > expsvLimit
 }
 
-func isEntityRelated(km Kill) (kill bool, loss bool, err error) {
+func isEntityRelated(km *Kill) (kill bool, loss bool, err error) {
 	kill = false
 	loss = false
 
