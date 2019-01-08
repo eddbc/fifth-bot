@@ -86,7 +86,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 	//token.
 
 	// Obtain a token source (automaticlly pulls refresh as needed)
-	tokSrc, err := SSOAuthenticator.TokenSource(token)
+	tokSrc := SSOAuthenticator.TokenSource(token)
 	if err != nil {
 		return
 		//return http.StatusInternalServerError, err

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/antihax/goesi/esi"
 	"github.com/eddbc/fifth-bot/isk"
 	"github.com/gorilla/websocket"
 	"log"
@@ -12,19 +13,21 @@ import (
 )
 
 var superTypes = []int32{
-	30, // Titan
+	30,  // Titan
 	659, // Supercarrier
 }
 
-var capTypes = []int32 {
-	485, // Dread
+var capTypes = []int32{
+	485,  // Dread
+	547,  // Carrier
+	1538, // FAX
 }
 
 var entitiesOfInterest = []int32{
+	98408504, // txfoz
+	//98481691, // nogrl
 	//1354830081, // goons
 	//99005338,	// horde
-	//98481691, // nogrl
-	98408504, // txfoz
 }
 
 var stagingSystems = []int32{
@@ -148,7 +151,7 @@ func processKill(kill Kill) {
 		important = true
 	} else if isNearbyCap {
 		important = true
-		msg = fmt.Sprintf("@here Capital activity in range!\n")
+		msg = fmt.Sprintf("Capital activity in range!\n")
 	}
 
 	// put zKill link in message
@@ -177,9 +180,18 @@ func isNearbyCap(km Kill) bool {
 	if err != nil {
 		return false
 	}
-	sys.Position.
 
-	if(isNearby){
+	for _, stagingId := range stagingSystems {
+		staging, _, err := Eve.UniverseApi.GetUniverseSystemsSystemId(ctx, stagingId, nil)
+		if err == nil {
+			distance := distanceBetweenSystems(staging, sys)
+			if distance < 8 {
+				isNearby = true
+			}
+		}
+	}
+
+	if isNearby {
 		for _, attacker := range km.Attackers {
 			t, _, err := Eve.UniverseApi.GetUniverseTypesTypeId(ctx, attacker.ShipTypeID, nil)
 			if err != nil {
@@ -200,18 +212,26 @@ func isNearbyCap(km Kill) bool {
 
 	return isCap && isNearby
 }
+
 type xyz struct {
 	x float64
 	y float64
 	z float64
-	
 }
-func distanceBetweenSystems(a xyz, b xyz) float64 {
-	x := math.Pow(b.x - a.x, 2)
-	y := math.Pow(b.y - a.y, 2)
-	z := math.Pow(b.z - a.z, 2)
-	return math.Pow(x + y + z, 0.5)
 
+func distanceBetweenSystems(a esi.GetUniverseSystemsSystemIdOk, b esi.GetUniverseSystemsSystemIdOk) float64 {
+	distance := distanceBetweenPoints(
+		xyz{a.Position.X, a.Position.Y, a.Position.Z},
+		xyz{b.Position.X, b.Position.Y, b.Position.Z},
+	)
+	return distance / 9460730472580800 // convert from Meters to LY
+}
+
+func distanceBetweenPoints(a xyz, b xyz) float64 {
+	x := math.Pow(b.x-a.x, 2)
+	y := math.Pow(b.y-a.y, 2)
+	z := math.Pow(b.z-a.z, 2)
+	return math.Pow(x+y+z, 0.5)
 }
 
 func isExpensive(km Kill) bool {
