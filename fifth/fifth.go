@@ -148,3 +148,10 @@ func fmtDuration(d time.Duration) string {
 	m := d / time.Minute
 	return fmt.Sprintf("%dh %dm", h, m)
 }
+
+func timeTrack(start time.Time, name string) {
+	elapsed := time.Since(start)
+	if Debug {
+		log.Printf("%s took %s", name, elapsed)
+	}
+}

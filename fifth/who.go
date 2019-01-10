@@ -12,6 +12,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 var supers = []string{"Hel", "Aeon", "Wyvern", "Nyx", "Vendetta", "Revenant", "Avatar", "Erebus", "Leviathan", "Ragnarok", "Molok", "Vanquisher", "Komodo"}
@@ -19,6 +20,7 @@ var caps = []string{"Apostle", "Lif", "Ninazu", "Minokawa", "Chimera", "Archon",
 var fittedSlots = []int32{27, 34, 19, 26, 11, 118, 87, 92, 98, 125, 132}
 
 func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
+	defer timeTrack(time.Now(), "getCharacterInfoEmbed")
 
 	ctx := context.Background()
 	strings := []string{"character"}
@@ -68,6 +70,8 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 		})
 	}
 
+	start := time.Now()
+
 	stats, e := zkillstats.get(cid)
 	if e == nil {
 		topShips := ""
@@ -95,6 +99,11 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 					}
 				}
 			}
+		}
+
+		elapsed := time.Since(start)
+		if Debug {
+			log.Printf("Stats took %s", elapsed)
 		}
 
 		if len(capsFlown) > 0 {
@@ -164,6 +173,8 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 }
 
 func isCynoChar(characterID int32) (cyno string, err error) {
+	defer timeTrack(time.Now(), "isCynoChar")
+
 	cyno = ""
 
 	r, err := http.Get(fmt.Sprintf("https://zkillboard.com/api/characterID/%v/losses/", characterID))
@@ -178,8 +189,18 @@ func isCynoChar(characterID int32) (cyno string, err error) {
 	var cynoLoss int32 = 0
 	json.Unmarshal(body, &kills)
 
+	//start = time.Now()
+	var killFetch time.Duration = 0
+	var cynoSearch time.Duration = 0
+
 	for _, k := range kills {
+
+		start := time.Now()
 		kill, _, err := Eve.KillmailsApi.GetKillmailsKillmailIdKillmailHash(ctx, k.Zkb.Hash, k.KillmailID, nil)
+		elapsed := time.Since(start)
+		killFetch += elapsed
+
+		start = time.Now()
 		if err == nil {
 			for _, item := range kill.Victim.Items {
 				if item.ItemTypeId == 21096 || item.ItemTypeId == 28646 {
@@ -193,6 +214,13 @@ func isCynoChar(characterID int32) (cyno string, err error) {
 				}
 			}
 		}
+		elapsed = time.Since(start)
+		cynoSearch += elapsed
+	}
+
+	if Debug {
+		log.Printf("time fetching kills %v", killFetch)
+		log.Printf("Time searching for cynos %v", cynoSearch)
 	}
 
 	if cynoLoss != 0 {

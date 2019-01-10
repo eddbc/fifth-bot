@@ -22,6 +22,7 @@ Get related data from provided IDs
 E.g. get character and corporation names
 */
 func (k *Kill) inflate() {
+	defer timeTrack(time.Now(), "inflate")
 	if k.inflated != true {
 		// zkill url
 		k.Zkb.url = fmt.Sprintf("https://zkillboard.com/kill/%v/", k.KillmailID)
@@ -110,6 +111,8 @@ func (k *Kill) getFinalBlow() (Attacker, error) {
 }
 
 func (k *Kill) interestingName() (string, error) {
+
+	defer timeTrack(time.Now(), "interestingName")
 	name := "Someone"
 
 	fnlBlw, err := k.getFinalBlow()

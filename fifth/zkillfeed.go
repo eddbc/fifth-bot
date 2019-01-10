@@ -55,7 +55,7 @@ func ListenZKill() {
 
 	err = c.WriteJSON(sub)
 	if err != nil {
-		log.Fatal("subscribe:", err)
+		log.Fatal("Error starting zKillboard websocket: ", err)
 	}
 
 	log.Printf("zKillboard feed running")
@@ -68,7 +68,7 @@ func ListenZKill() {
 			kill := Kill{}
 			err := c.ReadJSON(&kill)
 			if err != nil {
-				log.Fatal("websocket read: ", err)
+				log.Fatal("Restarting, zKillboard websocket closed: ", err)
 			}
 			processKill(&kill)
 		}
@@ -76,7 +76,7 @@ func ListenZKill() {
 
 	<-done
 
-	log.Fatal("zKill websocket closed")
+	defer log.Fatal("zKill websocket closed")
 }
 
 func logIgnore(reason string) {

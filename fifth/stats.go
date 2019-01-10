@@ -24,6 +24,7 @@ func init() {
 }
 
 func (z ZKillCharStats) get(id int32) (*ZKillCharacterStatsResp, error) {
+	defer timeTrack(time.Now(), "stats.get")
 	req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf(z.url, id), nil)
 	req.Header.Set("User-Agent", useragent)
 
