@@ -85,7 +85,7 @@ func getContractsForRegion(regionId int32) (expCon []esi.GetContractsPublicRegio
 		pages, _ = strconv.Atoi(resp.Header.Get("X-Pages"))
 		if err == nil {
 			for _, c := range contracts {
-				if c.Price > 1000000000 && c.Type_ == "item_exchange" {
+				if c.Type_ == "item_exchange" && c.Volume > 1300000 {
 					items, _, err := Eve.ContractsApi.GetContractsPublicItemsContractId(ctx, c.ContractId, nil)
 					if err != nil {
 						return expCon, err
