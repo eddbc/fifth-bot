@@ -140,7 +140,7 @@ func processKill(kill *Kill) {
 	}
 
 	if isLoss { // ship lost by entity of interest
-		msg = fmt.Sprintf("%v is a disgusting feeder\n", kill.Victim.CharacterName)
+		msg = fmt.Sprintf("**%v is a disgusting feeder**\n", kill.Victim.CharacterName)
 		react = true
 		if value > 100000000 {
 			important = true
