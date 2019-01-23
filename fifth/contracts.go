@@ -1,10 +1,11 @@
 package fifth
 
 import (
-	"context"
 	"fmt"
 	"github.com/antihax/goesi/esi"
+	"github.com/antihax/goesi/optional"
 	"github.com/bwmarrin/discordgo"
+	"github.com/eddbc/fifth-bot/isk"
 	"github.com/eddbc/fifth-bot/mux"
 	"log"
 	"strconv"
@@ -43,11 +44,15 @@ func (f *Fifth) SearchCapitalContracts(ds *discordgo.Session, dm *discordgo.Mess
 
 	log.Printf("%v contracts found", len(contracts))
 	_, err = ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("%v contracts found", len(contracts)))
+
+	msg := ""
+	for _, contract := range contracts {
+		msg = msg + makeContractMessage(contract) + "\n"
+	}
+	_, err = ds.ChannelMessageSend(dm.ChannelID, msg)
 }
 
 func getAllContracts() {
-	log.Println("cron job firing")
-
 	regions, _, err := Eve.UniverseApi.GetUniverseRegions(ctx, nil)
 
 	if err != nil {
@@ -55,51 +60,73 @@ func getAllContracts() {
 	}
 
 	var wg sync.WaitGroup
-	contractChannel := make(chan []esi.GetContractsPublicRegionId200Ok)
+	contractRegions := make(chan []ContractReport, len(regions))
 	for _, regionId := range regions {
 		wg.Add(1)
 		go func(regionId int32) {
 			defer wg.Done()
-			regionContracts, err := getContractsForRegion(regionId)
+			rc, err := getContractsForRegion(regionId)
 			if err != nil {
 				log.Fatal(err)
 			} else {
-				contractChannel <- regionContracts
+				contractRegions <- rc
 			}
 
 		}(regionId)
 	}
 	wg.Wait()
+	close(contractRegions)
+	for region := range contractRegions {
+		for _, contract := range region {
+			log.Print(makeContractMessage(contract))
+		}
+	}
 }
 
-func getContractsForRegion(regionId int32) (expCon []esi.GetContractsPublicRegionId200Ok, err error) {
-	expCon = make([]esi.GetContractsPublicRegionId200Ok, 0)
+func getContractsForRegion(regionId int32) (superContracts []ContractReport, err error) {
+	superContracts = make([]ContractReport, 0)
 
 	pages := 1
 	currentPage := 1
 
 	for currentPage <= pages {
 		log.Printf("processing page %v", currentPage)
-		c := context.WithValue(ctx, "Page", currentPage)
-		contracts, resp, err := Eve.ContractsApi.GetContractsPublicRegionId(c, regionId, nil)
+		contracts, resp, err := Eve.ContractsApi.GetContractsPublicRegionId(ctx, regionId, &esi.GetContractsPublicRegionIdOpts{
+			Page: optional.NewInt32(int32(currentPage)),
+		})
 		pages, _ = strconv.Atoi(resp.Header.Get("X-Pages"))
 		if err == nil {
-			for _, c := range contracts {
-				if c.Type_ == "item_exchange" && c.Volume > 1300000 {
-					items, _, err := Eve.ContractsApi.GetContractsPublicItemsContractId(ctx, c.ContractId, nil)
+			for _, contract := range contracts {
+				if contract.Type_ == "item_exchange" && contract.Volume > 1300000 {
+					items, _, err := Eve.ContractsApi.GetContractsPublicItemsContractId(ctx, contract.ContractId, nil)
 					if err != nil {
-						return expCon, err
+						return superContracts, err
 					}
+
+					isSuper := false
+					superType := ""
+					itemList := ""
+
 					for _, item := range items {
 						t, _, err := Eve.UniverseApi.GetUniverseTypesTypeId(ctx, item.TypeId, nil)
 						if err != nil {
-							return expCon, err
+							return superContracts, err
 						}
+						itemList = fmt.Sprintf("%v %v %v,", itemList, t.Name, item.Quantity)
 						for _, v := range superTypes {
 							if t.GroupId == v {
-								expCon = append(expCon, c)
+								isSuper = true
+								superType = t.Name
 							}
 						}
+					}
+					if isSuper {
+						superContracts = append(superContracts, ContractReport{
+							super:    superType,
+							region:   regionId,
+							contract: contract,
+							itemList: itemList,
+						})
 					}
 
 				}
@@ -109,4 +136,16 @@ func getContractsForRegion(regionId int32) (expCon []esi.GetContractsPublicRegio
 	}
 
 	return
+}
+
+func makeContractMessage(cr ContractReport) (msg string) {
+
+	return fmt.Sprintf("*%v* - %v <url=contract:%v//%v>", cr.super, isk.NearestThousandFormat(cr.contract.Price), cr.region, cr.contract.ContractId)
+}
+
+type ContractReport struct {
+	super    string
+	region   int32
+	contract esi.GetContractsPublicRegionId200Ok
+	itemList string
 }
