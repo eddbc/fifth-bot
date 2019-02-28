@@ -67,7 +67,7 @@ func getAllContracts() {
 			defer wg.Done()
 			rc, err := getContractsForRegion(regionId)
 			if err != nil {
-				log.Fatal(err)
+				log.Print(err)
 			} else {
 				contractRegions <- rc
 			}

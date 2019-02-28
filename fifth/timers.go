@@ -56,7 +56,7 @@ func (f *Fifth) AddTimer(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.
 		}
 	}
 
-	if d > 8 || h > 23 || m > 59 {
+	if d > 16 || h > 23 || m > 59 {
 		log.Println("Invalid Timer")
 		ds.ChannelMessageSend(dm.ChannelID, "Invalid Time Given")
 		return
