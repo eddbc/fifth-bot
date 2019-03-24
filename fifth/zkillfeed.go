@@ -29,7 +29,7 @@ var entitiesOfInterest = []int32{
 	//98537880, // IGN0R (aldent alt corp)
 
 	// Characters
-	95453757, // Frankie Reynolds
+	//95453757, // Frankie Reynolds
 	//2112892461, // Twinings Denniard
 	//2113824199, // Zero Zero Two
 
