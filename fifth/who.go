@@ -138,13 +138,13 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 			})
 		}
 
-		cyno, _ := isCynoChar(cid)
-		if cyno != "" {
-			fields = append(fields, &discordgo.MessageEmbedField{
-				Name:  "**Potential Cyno**",
-				Value: cyno,
-			})
-		}
+		//cyno, _ := isCynoChar(cid)
+		//if cyno != "" {
+		//	fields = append(fields, &discordgo.MessageEmbedField{
+		//		Name:  "**Potential Cyno**",
+		//		Value: cyno,
+		//	})
+		//}
 	}
 
 	fields = append(fields, &discordgo.MessageEmbedField{

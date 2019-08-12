@@ -7,6 +7,7 @@ import (
 	"github.com/eddbc/fifth-bot/evescout"
 	"github.com/eddbc/fifth-bot/mux"
 	"log"
+	"strconv"
 )
 
 func (f *Fifth) GetCurrentTheraHoles(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
@@ -49,13 +50,23 @@ func (f *Fifth) GetCurrentTheraHoles(ds *discordgo.Session, dm *discordgo.Messag
 	}
 
 	msg := "```"
-	for _, wh := range holes {
-		//if targetSystem == 0 {
-			msg = fmt.Sprintf("%v\n%v - %v  (%v)",msg, wh.SignatureID, wh.DestinationSolarSystem.Name, wh.DestinationSolarSystem.Region.Name)
-		//}
 
+
+	if targetSystem == 0 {
+		for _, wh := range holes {
+			msg = fmt.Sprintf("%v\n%v - %v (%v)",msg, wh.SignatureID, wh.DestinationSolarSystem.Name, wh.DestinationSolarSystem.Region.Name)
+		}
+	} else {
+		for _, wh := range holes {
+			route, _, err := Eve.RoutesApi.GetRouteOriginDestination(context.Background(), wh.DestinationSolarSystem.ID, targetSystem, nil)
+			if err == nil {
+				jumps := fmt.Sprintf("%v jumps",strconv.Itoa(len(route)))
+				msg = fmt.Sprintf("%v\n%v - %v %v (%v)",msg, wh.SignatureID, jumps, wh.DestinationSolarSystem.Name, wh.DestinationSolarSystem.Region.Name)
+			}
+
+		}
 	}
-	msg = fmt.Sprintf("%v\ntarget system: %v```",msg, targetSystem)
+	msg = fmt.Sprintf("%v\n```",msg)
 	_, _ = SendMsgToChan(dm.ChannelID,msg)
 }
 

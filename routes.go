@@ -29,7 +29,7 @@ func routes() {
 	Router.Route("setstatus", "", f.SetStatus)
 	Router.Route("time", "Get current EVE time, or time until a given EVE time (eg. !time 20:00)", f.EveTime)
 	Router.Route("who", "Get info about an EVE character", f.Who)
-	//Router.Route("thera", "List Current Thera Holes", f.GetCurrentTheraHoles)
+	Router.Route("thera", "List Current Thera Holes", f.GetCurrentTheraHoles)
 	Router.Route("range", "Get ranges for various ship types from a given system", f.Range)
 	//Router.Route("timer", "Add a timer with format: \"!timer 2d 6h 15m description and location goes here\"", f.AddTimer)
 	//Router.Route("timers", "List Timers with format \"description - date (time left) [ID]\"", f.ListTimers)
