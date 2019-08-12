@@ -10,7 +10,7 @@ import (
 
 func (f *Fifth) Range(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 	if len(ctx.Fields) <= 1 {
-		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("<@%v> You need to specify a system you fucking noob", dm.Author.ID))
+		SendMsgToChan(dm.ChannelID, "You need to specify a system you fucking noob")
 		return
 	}
 
@@ -18,12 +18,12 @@ func (f *Fifth) Range(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Con
 	res, _, err := Eve.SearchApi.GetSearch(context.Background(), strings, ctx.Fields[1], nil)
 	if err != nil {
 		log.Printf("Error searching for system: %v", err)
-		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("<@%v> Error searching for system", dm.Author.ID))
+		SendMsgToChan(dm.ChannelID, "Error searching for system")
 		return
 	}
 
 	if len(res.SolarSystem) == 0 {
-		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("<@%v> Couldn't find that system", dm.Author.ID))
+		SendMsgToChan(dm.ChannelID, "Couldn't find that system")
 		return
 	}
 
@@ -36,7 +36,7 @@ func (f *Fifth) Range(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Con
 
 			}
 		}
-		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("<@%v> Found %v possible matches : %v", dm.Author.ID, len(res.SolarSystem), systems))
+		SendMsgToChan(dm.ChannelID, fmt.Sprintf("Found %v possible matches : %v", len(res.SolarSystem), systems))
 		return
 	}
 
@@ -52,7 +52,7 @@ func (f *Fifth) Range(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Con
 		for _, class := range classes {
 			ranges = fmt.Sprintf("%v\n%v : <http://evemaps.dotlan.net/range/%v,5/%v/>", ranges, class.size, class.class, system.Name)
 		}
-		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("<@%v> Ranges from %v: %v", dm.Author.ID, system.Name, ranges))
+		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Ranges from %v: %v", system.Name, ranges))
 	}
 
 }

@@ -16,22 +16,19 @@ var superTypes = []int32{
 	659, // Supercarrier
 }
 
-var capTypes = []int32{
-	485,  // Dread
-	547,  // Carrier
-	1538, // FAX
-}
+//var capTypes = []int32{
+//	485,  // Dread
+//	547,  // Carrier
+//	1538, // FAX
+//}
 
 var entitiesOfInterest = []int32{
 
 	// Corps
-	98408504, // txfoz
-	//98537880, // IGN0R (aldent alt corp)
+	98326834,   // NOG8S
 
 	// Characters
-	//95453757, // Frankie Reynolds
-	//2112892461, // Twinings Denniard
-	//2113824199, // Zero Zero Two
+	91872672,  // Edd Reynolds
 
 	// Testing Groups
 	//1354830081, // goons
@@ -39,9 +36,9 @@ var entitiesOfInterest = []int32{
 	//498125261, // test
 }
 
-var stagingSystems = []int32{
-	30000974, // H-8F5Q
-}
+//var stagingSystems = []int32{
+//	30000974, // H-8F5Q
+//}
 
 func ListenZKill() {
 	url := "wss://zkillboard.com:2096"
@@ -68,7 +65,7 @@ func ListenZKill() {
 			kill := Kill{}
 			err := c.ReadJSON(&kill)
 			if err != nil {
-				log.Fatal("Restarting, zKillboard websocket closed: ", err)
+				log.Fatal("Error, Restarting, zKillboard websocket closed: ", err)
 			}
 			processKill(&kill)
 		}
@@ -111,8 +108,8 @@ func processKill(kill *Kill) {
 	}
 
 	// get filtering criteria
-	isExpsv := isExpensive(kill)
-	isNearbyCap := isNearbyCap(kill)
+	//isExpsv := isExpensive(kill)
+	//isNearbyCap := isNearbyCap(kill)
 	isKill, isLoss, err := isEntityRelated(kill)
 	if err != nil {
 		return
@@ -132,7 +129,7 @@ func processKill(kill *Kill) {
 	}
 
 	// get kill details if matches any criteria, exit if not
-	if isExpsv || isKill || isLoss {
+	if isKill || isLoss {
 		kill.inflate()
 	} else {
 		logIgnore("doesn't match criteria")
@@ -156,11 +153,11 @@ func processKill(kill *Kill) {
 			// <1B kills are not important
 			msg = fmt.Sprintf("%v isn't completely useless.\n", name)
 		}
-	} else if isExpsv { // kill is expensive
-		important = true
-	} else if isNearbyCap {
-		important = true
-		msg = fmt.Sprintf("Capital activity in range!\n")
+	//} else if isExpsv { // kill is expensive
+	//	important = true
+	//} else if isNearbyCap {
+	//	important = true
+	//	msg = fmt.Sprintf("Capital activity in range!\n")
 	}
 
 	// put zKill link in message
@@ -181,40 +178,40 @@ func processKill(kill *Kill) {
 	}
 }
 
-func isNearbyCap(km *Kill) bool {
-	isCap := false
-	isNearby := false
-
-	for _, stagingId := range stagingSystems {
-		distance, err := distanceBetweenSystems(stagingId, km.SolarSystemID)
-		if err == nil {
-			if distance < 8 {
-				isNearby = true
-			}
-		}
-	}
-
-	if isNearby {
-		for _, attacker := range km.Attackers {
-			t, _, err := Eve.UniverseApi.GetUniverseTypesTypeId(ctx, attacker.ShipTypeID, nil)
-			if err != nil {
-				return false
-			}
-			for _, capId := range capTypes {
-				if t.GroupId == capId {
-					isCap = true
-				}
-			}
-			for _, superId := range superTypes {
-				if t.GroupId == superId {
-					isCap = true
-				}
-			}
-		}
-	}
-
-	return isCap && isNearby
-}
+//func isNearbyCap(km *Kill) bool {
+//	isCap := false
+//	isNearby := false
+//
+//	for _, stagingId := range stagingSystems {
+//		distance, err := distanceBetweenSystems(stagingId, km.SolarSystemID)
+//		if err == nil {
+//			if distance < 8 {
+//				isNearby = true
+//			}
+//		}
+//	}
+//
+//	if isNearby {
+//		for _, attacker := range km.Attackers {
+//			t, _, err := Eve.UniverseApi.GetUniverseTypesTypeId(ctx, attacker.ShipTypeID, nil)
+//			if err != nil {
+//				return false
+//			}
+//			for _, capId := range capTypes {
+//				if t.GroupId == capId {
+//					isCap = true
+//				}
+//			}
+//			for _, superId := range superTypes {
+//				if t.GroupId == superId {
+//					isCap = true
+//				}
+//			}
+//		}
+//	}
+//
+//	return isCap && isNearby
+//}
 
 type xyz struct {
 	x float64
