@@ -8,7 +8,7 @@ import (
 var debugChannel = "459341365562572803"     // testing-lab
 var importantChannel = "610240336958062593" // general
 var spamChannel = "610240336958062593"      // kill-feed
-var timerChannel = "517892609155399683"
+var timerChannel = "610240336958062593"
 
 func SendMsg(msg string) (*discordgo.Message, error) {
 	return SendMsgToChan(spamChannel, msg)

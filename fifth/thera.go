@@ -7,6 +7,7 @@ import (
 	"github.com/eddbc/fifth-bot/evescout"
 	"github.com/eddbc/fifth-bot/mux"
 	"log"
+	"sort"
 	"strconv"
 )
 
@@ -57,16 +58,28 @@ func (f *Fifth) GetCurrentTheraHoles(ds *discordgo.Session, dm *discordgo.Messag
 			msg = fmt.Sprintf("%v\n%v - %v (%v)",msg, wh.SignatureID, wh.DestinationSolarSystem.Name, wh.DestinationSolarSystem.Region.Name)
 		}
 	} else {
+		var routedWhs []routedWh
 		for _, wh := range holes {
 			route, _, err := Eve.RoutesApi.GetRouteOriginDestination(context.Background(), wh.DestinationSolarSystem.ID, targetSystem, nil)
 			if err == nil {
 				jumps := fmt.Sprintf("%v jumps",strconv.Itoa(len(route)))
-				msg = fmt.Sprintf("%v\n%v - %v %v (%v)",msg, wh.SignatureID, jumps, wh.DestinationSolarSystem.Name, wh.DestinationSolarSystem.Region.Name)
+				m := fmt.Sprintf("%v - %v %v (%v)", wh.SignatureID, jumps, wh.DestinationSolarSystem.Name, wh.DestinationSolarSystem.Region.Name)
+				routedWhs = append(routedWhs, routedWh{jumps:len(route), str:m})
 			}
 
+		}
+		sort.Slice(routedWhs, func(i, j int) bool {
+			return routedWhs[i].jumps < routedWhs[j].jumps
+		})
+		for _, wh := range routedWhs {
+			msg = fmt.Sprintf("%v\n%v", msg, wh.str)
 		}
 	}
 	msg = fmt.Sprintf("%v\n```",msg)
 	_, _ = SendMsgToChan(dm.ChannelID,msg)
 }
 
+type routedWh struct {
+	jumps int
+	str string
+}
