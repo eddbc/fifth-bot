@@ -9,10 +9,18 @@ import (
 var DB *bbolt.DB
 
 const TimersKey = "timers"
+const TheraHolesKey = "theraHoles"
 
 func DBInit() {
 	DB.Update(func(tx *bbolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(TimersKey))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
+		return nil
+	})
+	DB.Update(func(tx *bbolt.Tx) error {
+		_, err := tx.CreateBucketIfNotExists([]byte(TheraHolesKey))
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
 		}

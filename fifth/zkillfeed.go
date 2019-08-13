@@ -25,10 +25,10 @@ var superTypes = []int32{
 var entitiesOfInterest = []int32{
 
 	// Corps
-	98326834,   // NOG8S
+	98326834, // NOG8S
 
 	// Characters
-	91872672,  // Edd Reynolds
+	91872672, // Edd Reynolds
 
 	// Testing Groups
 	//1354830081, // goons
@@ -154,11 +154,11 @@ func processKill(kill *Kill) {
 			// <1B kills are not important
 			msg = fmt.Sprintf("%v isn't completely useless.\n", name)
 		}
-	//} else if isExpsv { // kill is expensive
-	//	important = true
-	//} else if isNearbyCap {
-	//	important = true
-	//	msg = fmt.Sprintf("Capital activity in range!\n")
+		//} else if isExpsv { // kill is expensive
+		//	important = true
+		//} else if isNearbyCap {
+		//	important = true
+		//	msg = fmt.Sprintf("Capital activity in range!\n")
 	}
 
 	// put zKill link in message

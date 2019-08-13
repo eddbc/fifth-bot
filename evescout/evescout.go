@@ -12,7 +12,7 @@ func init() {
 	httpClient = &http.Client{}
 }
 
-func GetTheraHoles()(holes []Wormhole, err error){
+func GetTheraHoles() (holes []Wormhole, err error) {
 	r, err := httpClient.Get("https://www.eve-scout.com/api/wormholes")
 	if err != nil {
 		return
