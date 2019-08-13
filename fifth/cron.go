@@ -14,7 +14,7 @@ func init() {
 	c = cron.New()
 
 	c.AddFunc("@every 10s", func() { timerCron() })
-	c.AddFunc("@every 10s", func() { theraCron() })
+	c.AddFunc("@every 30s", func() { theraCron() })
 	//C.AddFunc("@every 3m", func(){ getAllContracts() })
 	c.AddFunc("0 0 19 * * *", func() { circlejerk() })
 

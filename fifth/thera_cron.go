@@ -88,7 +88,7 @@ func newHole(wh evescout.Wormhole){
 		jumps := len(route)
 		if jumps <= 5 {
 			jumpsStr := fmt.Sprintf("%v jumps", strconv.Itoa(jumps))
-			m := fmt.Sprintf("%v - %v %v (%v)", wh.SignatureID, jumpsStr, wh.DestinationSolarSystem.Name, wh.DestinationSolarSystem.Region.Name)
+			m := fmt.Sprintf("%v - %v %v [%.1f] (%v)", wh.SignatureID, jumpsStr, wh.DestinationSolarSystem.Name, wh.DestinationSolarSystem.Security, wh.DestinationSolarSystem.Region.Name)
 			SendMsg(fmt.Sprintf("<@&610241709753761802> New Jita Hole - %v", m))
 		}
 	}
