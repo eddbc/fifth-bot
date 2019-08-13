@@ -62,7 +62,7 @@ func (f *Fifth) GetCurrentTheraHoles(ds *discordgo.Session, dm *discordgo.Messag
 		for _, wh := range holes {
 			route, _, err := Eve.RoutesApi.GetRouteOriginDestination(context.Background(), wh.DestinationSolarSystem.ID, targetSystem, nil)
 			if err == nil {
-				jumps := fmt.Sprintf("%v jumps", strconv.Itoa(len(route)))
+				jumps := fmt.Sprintf("%v jumps", strconv.Itoa(len(route)-1))
 				m := fmt.Sprintf("%v - %v %v [%.1f] (%v)", wh.SignatureID, jumps, wh.DestinationSolarSystem.Name, wh.DestinationSolarSystem.Security, wh.DestinationSolarSystem.Region.Name)
 				routedWhs = append(routedWhs, routedWh{jumps: len(route), str: m})
 			}
