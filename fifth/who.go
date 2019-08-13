@@ -80,7 +80,7 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 		for _, st := range stats.TopAllTime {
 			if st.Type == "ship" {
 				for i, stat := range st.Data {
-					ship, _, err := Eve.UniverseApi.GetUniverseTypesTypeId(ctx, int32(stat.ShipTypeId), nil)
+					ship, _, err := Eve.UniverseApi.GetUniverseTypesTypeId(ctx, int32(stat.ShipTypeID), nil)
 					if i < 5 {
 						if err == nil {
 							topShips = fmt.Sprintf("%v%v: %v kills\n", topShips, ship.Name, stat.Kills)
@@ -186,12 +186,12 @@ func isCynoChar(characterID int32) (cyno string, err error) {
 	body, err := ioutil.ReadAll(r.Body)
 
 	var kills []Kill
-	var cynoLoss int32 = 0
+	var cynoLoss int32
 	json.Unmarshal(body, &kills)
 
 	//start = time.Now()
-	var killFetch time.Duration = 0
-	var cynoSearch time.Duration = 0
+	var killFetch time.Duration
+	var cynoSearch time.Duration
 
 	for _, k := range kills {
 

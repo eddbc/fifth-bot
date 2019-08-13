@@ -9,9 +9,9 @@ import (
 	"time"
 )
 
-var zkillstats ZKillCharStats
+var zkillstats zKillCharStats
 
-type ZKillCharStats struct {
+type zKillCharStats struct {
 	client http.Client
 	url    string
 }
@@ -20,10 +20,10 @@ func init() {
 	client := http.Client{
 		Timeout: time.Second * 5, // Maximum of 5 secs
 	}
-	zkillstats = ZKillCharStats{client: client, url: "https://zkillboard.com/api/stats/characterID/%d/"}
+	zkillstats = zKillCharStats{client: client, url: "https://zkillboard.com/api/stats/characterID/%d/"}
 }
 
-func (z ZKillCharStats) get(id int32) (*ZKillCharacterStatsResp, error) {
+func (z zKillCharStats) get(id int32) (*zKillCharacterStatsResp, error) {
 	defer timeTrack(time.Now(), "stats.get")
 	req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf(z.url, id), nil)
 	req.Header.Set("User-Agent", useragent)
@@ -35,7 +35,7 @@ func (z ZKillCharStats) get(id int32) (*ZKillCharacterStatsResp, error) {
 	}
 
 	body, _ := ioutil.ReadAll(res.Body)
-	stats := ZKillCharacterStatsResp{}
+	stats := zKillCharacterStatsResp{}
 	jsonErr := json.Unmarshal(body, &stats)
 	if jsonErr != nil {
 		log.Printf("Error! %s\n", jsonErr)
@@ -45,7 +45,7 @@ func (z ZKillCharStats) get(id int32) (*ZKillCharacterStatsResp, error) {
 	return &stats, nil
 }
 
-type ZKillCharacterStatsResp struct {
+type zKillCharacterStatsResp struct {
 	AllTimeSum   int  `json:"allTimeSum"`
 	CalcTrophies bool `json:"calcTrophies"`
 	DangerRatio  int  `json:"dangerRatio"`
@@ -1027,7 +1027,7 @@ type ZKillCharacterStatsResp struct {
 			Kills int `json:"kills"`
 			//CharacterID   int    `json:"characterID"`
 			//CorporationID int    `json:"corporationID"`
-			ShipTypeId int `json:"shipTypeID"`
+			ShipTypeID int `json:"shipTypeID"`
 		} `json:"data"`
 	} `json:"topAllTime"`
 	Trophies struct {

@@ -13,25 +13,26 @@ import (
 	"time"
 )
 
-type Timer struct {
+type timer struct {
 	ID          int       `json:"id"`
 	Time        time.Time `json:"time"`
 	Description string    `json:"description"`
 	Pinged      bool      `json:"pinged"`
 }
 
-func (t *Timer) toStr() string {
+func (t *timer) toStr() string {
 	loc, _ := time.LoadLocation("Atlantic/Reykjavik")
 	_, _, d, h, m, _ := diff(time.Now().In(loc), t.Time)
 	return fmt.Sprintf("%v - %v (%vd %vh %vm) [%v]", t.Description, t.Time.Format("Jan 2, 15:04"), d, h, m, t.ID)
 }
 
+//AddTimer Bot command to add a timer to the timer board
 func (f *Fifth) AddTimer(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 	desc := ""
 	d := 0
 	h := 0
 	m := 0
-	var err error = nil
+	var err error
 	for k, v := range ctx.Fields {
 		if k == 1 {
 			d, err = removeTrailingChar(v)
@@ -79,17 +80,18 @@ func (f *Fifth) AddTimer(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.
 	log.Println(s)
 	ds.ChannelMessageSend(dm.ChannelID, s)
 
-	saveTimer(Timer{Time: then, Description: desc, Pinged: false})
+	saveTimer(timer{Time: then, Description: desc, Pinged: false})
 }
 
+//ListTimers bot command to return a list of current timers
 func (f *Fifth) ListTimers(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
-	var timers []Timer
+	var timers []timer
 	storage.DB.View(func(tx *bbolt.Tx) error {
 		// Assume bucket exists and has keys
 		b := tx.Bucket([]byte(storage.TimersKey))
 
 		b.ForEach(func(k, v []byte) error {
-			r := Timer{}
+			r := timer{}
 			json.Unmarshal(v, &r)
 			timers = append(timers, r)
 			return nil
@@ -114,6 +116,7 @@ func (f *Fifth) ListTimers(ds *discordgo.Session, dm *discordgo.Message, ctx *mu
 	//ds.ChannelMessageSend(dm.ChannelID, resp)
 }
 
+// RemoveTimer bot command to remove a timer from the timer board
 func (f *Fifth) RemoveTimer(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 
 	i, err := strconv.Atoi(ctx.Fields[1])
@@ -136,7 +139,7 @@ func timerCron() {
 		b := tx.Bucket([]byte(storage.TimersKey))
 
 		b.ForEach(func(k, v []byte) error {
-			timer := Timer{}
+			timer := timer{}
 			json.Unmarshal(v, &timer)
 
 			if !timer.Pinged {
@@ -161,7 +164,7 @@ func timerCron() {
 	})
 }
 
-func saveTimer(t Timer) {
+func saveTimer(t timer) {
 	storage.DB.Update(func(tx *bbolt.Tx) error {
 		b := tx.Bucket([]byte(storage.TimersKey))
 		if b == nil {

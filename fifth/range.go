@@ -8,6 +8,7 @@ import (
 	"log"
 )
 
+//Range Bot command to give dotlan links with the jump ranges fro ma given system
 func (f *Fifth) Range(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 	if len(ctx.Fields) <= 1 {
 		SendMsgToChan(dm.ChannelID, "You need to specify a system you fucking noob")

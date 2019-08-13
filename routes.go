@@ -36,7 +36,7 @@ func routes() {
 	//Router.Route("timer-remove", "Remove a timer with a given ID", f.RemoveTimer)
 	Router.Route("servers", "", f.Servers)
 	if debug {
-		Router.Route("test", "", f.Test)
+		Router.Route("test", "", f.EmoteTest)
 		Router.Route("supers", "Search public contracts in a region for super capitals", f.SearchCapitalContracts)
 	}
 

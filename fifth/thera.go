@@ -11,6 +11,7 @@ import (
 	"strconv"
 )
 
+// GetCurrentTheraHoles Bot command to list currently active thera holes, with optional ranges to a target system
 func (f *Fifth) GetCurrentTheraHoles(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 
 	targetSystem  := int32(0)

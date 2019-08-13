@@ -12,6 +12,7 @@ import (
 	"sync"
 )
 
+//SearchCapitalContracts Bot command to fetch super-capital contracts
 func (f *Fifth) SearchCapitalContracts(ds *discordgo.Session, dm *discordgo.Message, muxCtx *mux.Context) {
 	rgnStr := ""
 	for k, v := range muxCtx.Fields {
@@ -30,14 +31,14 @@ func (f *Fifth) SearchCapitalContracts(ds *discordgo.Session, dm *discordgo.Mess
 		return
 	}
 
-	rgnId := sres.Region[0]
+	rgnID := sres.Region[0]
 
-	region, _, err := Eve.UniverseApi.GetUniverseRegionsRegionId(ctx, rgnId, nil)
+	region, _, err := Eve.UniverseApi.GetUniverseRegionsRegionId(ctx, rgnID, nil)
 	_, err = ds.ChannelMessageSend(dm.ChannelID,
 		fmt.Sprintf("Searching for contracts in %v... (May take a while)", region.Name),
 	)
 
-	contracts, err := getContractsForRegion(rgnId)
+	contracts, err := getContractsForRegion(rgnID)
 	if err != nil {
 		return
 	}
@@ -60,8 +61,8 @@ func getAllContracts() {
 	}
 
 	var wg sync.WaitGroup
-	contractRegions := make(chan []ContractReport, len(regions))
-	for _, regionId := range regions {
+	contractRegions := make(chan []contractReport, len(regions))
+	for _, regionID := range regions {
 		wg.Add(1)
 		go func(regionId int32) {
 			defer wg.Done()
@@ -72,7 +73,7 @@ func getAllContracts() {
 				contractRegions <- rc
 			}
 
-		}(regionId)
+		}(regionID)
 	}
 	wg.Wait()
 	close(contractRegions)
@@ -83,15 +84,15 @@ func getAllContracts() {
 	}
 }
 
-func getContractsForRegion(regionId int32) (superContracts []ContractReport, err error) {
-	superContracts = make([]ContractReport, 0)
+func getContractsForRegion(regionID int32) (superContracts []contractReport, err error) {
+	superContracts = make([]contractReport, 0)
 
 	pages := 1
 	currentPage := 1
 
 	for currentPage <= pages {
 		log.Printf("processing page %v", currentPage)
-		contracts, resp, err := Eve.ContractsApi.GetContractsPublicRegionId(ctx, regionId, &esi.GetContractsPublicRegionIdOpts{
+		contracts, resp, err := Eve.ContractsApi.GetContractsPublicRegionId(ctx, regionID, &esi.GetContractsPublicRegionIdOpts{
 			Page: optional.NewInt32(int32(currentPage)),
 		})
 		pages, _ = strconv.Atoi(resp.Header.Get("X-Pages"))
@@ -121,9 +122,9 @@ func getContractsForRegion(regionId int32) (superContracts []ContractReport, err
 						}
 					}
 					if isSuper {
-						superContracts = append(superContracts, ContractReport{
+						superContracts = append(superContracts, contractReport{
 							super:    superType,
-							region:   regionId,
+							region:   regionID,
 							contract: contract,
 							itemList: itemList,
 						})
@@ -138,12 +139,12 @@ func getContractsForRegion(regionId int32) (superContracts []ContractReport, err
 	return
 }
 
-func makeContractMessage(cr ContractReport) (msg string) {
+func makeContractMessage(cr contractReport) (msg string) {
 
 	return fmt.Sprintf("*%v* - %v <url=contract:%v//%v>", cr.super, isk.NearestThousandFormat(cr.contract.Price), cr.region, cr.contract.ContractId)
 }
 
-type ContractReport struct {
+type contractReport struct {
 	super    string
 	region   int32
 	contract esi.GetContractsPublicRegionId200Ok

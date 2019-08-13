@@ -2,7 +2,7 @@ package fifth
 
 import (
 	"github.com/antihax/goesi"
-	"github.com/eddbc/fifth-bot/esiStatus"
+	"github.com/eddbc/fifth-bot/esistatus"
 	"github.com/eddbc/fifth-bot/storage"
 	"github.com/gregjones/httpcache"
 	bolt "go.etcd.io/bbolt"
@@ -29,7 +29,7 @@ func init() {
 }
 
 func TestEsiStatus(t *testing.T) {
-	g, y, r, err := esiStatus.GetEsiStatus()
+	g, y, r, err := esistatus.GetEsiStatus()
 	if err != nil {
 		t.Fatalf("error getting status: %v", err)
 	}

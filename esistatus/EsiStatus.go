@@ -1,4 +1,4 @@
-package esiStatus
+package esistatus
 
 import (
 	"encoding/json"
@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+//GetEsiStatus Gets number of green, yellow, and red ESI endpoints
 func GetEsiStatus() (green int, yellow int, red int, err error) {
 
 	green = 0

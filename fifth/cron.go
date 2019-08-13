@@ -5,19 +5,19 @@ import (
 	"github.com/robfig/cron"
 )
 
-var C *cron.Cron
+var c *cron.Cron
 
 var ctx context.Context
 
 func init() {
 	ctx = context.Background()
-	C = cron.New()
+	c = cron.New()
 
-	C.AddFunc("@every 10s", func() { timerCron() })
+	c.AddFunc("@every 10s", func() { timerCron() })
 	//C.AddFunc("@every 3m", func(){ getAllContracts() })
-	C.AddFunc("0 0 19 * * *", func() { circlejerk() })
+	c.AddFunc("0 0 19 * * *", func() { circlejerk() })
 
-	C.Start()
+	c.Start()
 }
 
 func circlejerk() {

@@ -40,6 +40,7 @@ var entitiesOfInterest = []int32{
 //	30000974, // H-8F5Q
 //}
 
+//ListenZKill Start live zKill feed
 func ListenZKill() {
 	url := "wss://zkillboard.com:2096"
 	c, _, err := websocket.DefaultDialer.Dial(url, nil)
@@ -260,7 +261,7 @@ func isEntityRelated(km *Kill) (kill bool, loss bool, err error) {
 		if r := recover(); r != nil {
 			err = errors.New("error getting related information")
 			log.Printf("error getting related information for kill %v: %v+", km.KillmailID, r)
-			//SendDebugMsg(fmt.Sprintf("error getting related information for kill: <%v>", km.getUrl()))
+			//SendDebugMsg(fmt.Sprintf("error getting related information for kill: <%v>", km.getURL()))
 		}
 	}()
 

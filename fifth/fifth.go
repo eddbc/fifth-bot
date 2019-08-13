@@ -5,20 +5,27 @@ import (
 	"fmt"
 	"github.com/antihax/goesi/esi"
 	"github.com/bwmarrin/discordgo"
-	"github.com/eddbc/fifth-bot/esiStatus"
+	"github.com/eddbc/fifth-bot/esistatus"
 	"github.com/eddbc/fifth-bot/mux"
 	"log"
 	"time"
 )
 
+//Eve ESI Client
 var Eve *esi.APIClient
+
+//Session Discord client session
 var Session *discordgo.Session
+
+//Debug Debug mode enabled
 var Debug bool
 
 const useragent = "fifth-bot, edd_reynolds on slack"
 
+//Fifth Discord Bot Main Struct
 type Fifth struct{}
 
+//Status Bot command to get EVE Online server status
 func (f *Fifth) Status(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 
 	msg := ""
@@ -39,7 +46,7 @@ func (f *Fifth) Status(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Co
 		msg = fmt.Sprintf("Disgusting subhumans currently on TQ: %d\n", status.Players)
 	}
 
-	g, y, r, err := esiStatus.GetEsiStatus()
+	g, y, r, err := esistatus.GetEsiStatus()
 	if err != nil {
 		msg = fmt.Sprintf("%vError getting ESI status\n", msg)
 	} else {
@@ -59,6 +66,7 @@ func (f *Fifth) Status(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Co
 	_, err = ds.ChannelMessageSend(dm.ChannelID, msg)
 }
 
+//EveTime bot command to give current EVE time, or time until given EVE time
 func (f *Fifth) EveTime(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 
 	//init the loc
@@ -83,6 +91,7 @@ func (f *Fifth) EveTime(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.C
 
 }
 
+//Who Bot command to give information about a given character
 func (f *Fifth) Who(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 
 	name := ""
@@ -108,6 +117,7 @@ func (f *Fifth) Who(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Conte
 	}
 }
 
+//SetStatus Bot command to set the 'currently playing' status of the bot
 func (f *Fifth) SetStatus(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 	status := ""
 
@@ -123,6 +133,7 @@ func (f *Fifth) SetStatus(ds *discordgo.Session, dm *discordgo.Message, ctx *mux
 	ds.UpdateStatus(0, status)
 }
 
+//Servers Bot command to list currently connected servers
 func (f *Fifth) Servers(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 	msg := fmt.Sprintf("**Connected to %v servers :**", len(Session.State.Guilds))
 	for _, guild := range ds.State.Guilds {
@@ -132,7 +143,8 @@ func (f *Fifth) Servers(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.C
 	Session.MessageReactionAdd(m.ChannelID, m.ID, "509447602291605519")
 }
 
-func (f *Fifth) Test(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
+//EmoteTest Bot command to test emote reacting
+func (f *Fifth) EmoteTest(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
 	m, _ := SendMsgToChan(dm.ChannelID, "reaction test")
 	err := Session.MessageReactionAdd(m.ChannelID, m.ID, ":rip:486665154356969496")
 

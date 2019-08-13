@@ -13,7 +13,7 @@ import (
 // Methods
 //
 
-func (k *Kill) getUrl() string {
+func (k *Kill) getURL() string {
 	return fmt.Sprintf("https://zkillboard.com/kill/%v/", k.KillmailID)
 }
 
@@ -102,9 +102,8 @@ func (k *Kill) getFinalBlow() (Attacker, error) {
 			if err == nil {
 				at.CharacterName = fb.Name
 				return at, nil
-			} else {
-				log.Printf("inflate final blow character: %v", err)
 			}
+			log.Printf("inflate final blow character: %v", err)
 		}
 	}
 
@@ -138,27 +137,27 @@ func (k *Kill) interestingName() (string, error) {
 /*
 Check if an entity (character, corp or alliance) was involved in a kill
 */
-func (k *Kill) involved(entityId int32) bool {
-	return k.isAttacker(entityId) || k.isVictim(entityId)
+func (k *Kill) involved(entityID int32) bool {
+	return k.isAttacker(entityID) || k.isVictim(entityID)
 }
 
 /*
 Check if an entity (character, corp or alliance) was an attacker in a kill
 */
-func (k *Kill) isAttacker(entityId int32) bool {
+func (k *Kill) isAttacker(entityID int32) bool {
 
 	k.InterestingAttackers = nil
 
 	for _, a := range k.Attackers {
 		r := false
 
-		if a.CharacterID == entityId {
+		if a.CharacterID == entityID {
 			r = true
 		}
-		if a.CorporationID == entityId {
+		if a.CorporationID == entityID {
 			r = true
 		}
-		if a.AllianceID == entityId {
+		if a.AllianceID == entityID {
 			r = true
 		}
 
@@ -177,15 +176,15 @@ func (k *Kill) isAttacker(entityId int32) bool {
 /*
 Check if an entity (character, corp or alliance) was the victim in a kill
 */
-func (k *Kill) isVictim(entityId int32) bool {
+func (k *Kill) isVictim(entityID int32) bool {
 	loss := false
-	if k.Victim.CharacterID == entityId {
+	if k.Victim.CharacterID == entityID {
 		loss = true
 	}
-	if k.Victim.CorporationID == entityId {
+	if k.Victim.CorporationID == entityID {
 		loss = true
 	}
-	if k.Victim.AllianceID == entityId {
+	if k.Victim.AllianceID == entityID {
 		loss = true
 	}
 
@@ -195,9 +194,8 @@ func (k *Kill) isVictim(entityId int32) bool {
 func (c *Character) ticker() string {
 	if c.AllianceTicker == "" {
 		return c.CorporationTicker
-	} else {
-		return c.AllianceTicker
 	}
+	return c.AllianceTicker
 }
 
 //
@@ -206,6 +204,7 @@ func (c *Character) ticker() string {
 
 type byDamage []Attacker
 
+//Kill Killmail
 type Kill struct {
 	Attackers            []Attacker `json:"attackers"`
 	InterestingAttackers []Attacker
@@ -230,6 +229,7 @@ type Kill struct {
 	inflated bool
 }
 
+//Victim Thing destroyed in a killmaill
 type Victim struct {
 	Character
 	DamageTaken int `json:"damage_taken"`
@@ -253,6 +253,7 @@ type Victim struct {
 	} `json:"position"`
 }
 
+//Attacker Aggressor on a killmail
 type Attacker struct {
 	Character
 	DamageDone     int     `json:"damage_done"`
@@ -261,6 +262,7 @@ type Attacker struct {
 	WeaponTypeID   int     `json:"weapon_type_id"`
 }
 
+//Character EVE Online character on a killmail
 type Character struct {
 	AllianceID     int32 `json:"alliance_id,omitempty"`
 	AllianceName   string
