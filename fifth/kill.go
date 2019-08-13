@@ -57,6 +57,7 @@ func (k *Kill) inflate() {
 		if err == nil {
 			k.Victim.CharacterName = vic.Name
 		} else {
+			k.Victim.CharacterName = "Someone"
 			log.Printf("inflate character: %v", err)
 		}
 
@@ -230,7 +231,7 @@ type Kill struct {
 }
 
 type Victim struct {
-	*Character
+	Character
 	DamageTaken int `json:"damage_taken"`
 	Items       []struct {
 		Flag              int `json:"flag"`
@@ -253,7 +254,7 @@ type Victim struct {
 }
 
 type Attacker struct {
-	*Character
+	Character
 	DamageDone     int     `json:"damage_done"`
 	FinalBlow      bool    `json:"final_blow"`
 	SecurityStatus float64 `json:"security_status"`

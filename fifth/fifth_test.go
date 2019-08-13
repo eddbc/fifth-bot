@@ -1,7 +1,6 @@
 package fifth
 
 import (
-	"fmt"
 	"github.com/antihax/goesi"
 	"github.com/eddbc/fifth-bot/esiStatus"
 	"github.com/eddbc/fifth-bot/storage"
@@ -35,5 +34,5 @@ func TestEsiStatus(t *testing.T) {
 		t.Fatalf("error getting status: %v", err)
 	}
 
-	fmt.Printf("ESI Status - green: %v, yellow: %v, red: %v", g, y, r)
+	t.Logf("ESI Status - green: %v, yellow: %v, red: %v", g, y, r)
 }
