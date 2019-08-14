@@ -60,7 +60,7 @@ func theraCron() {
 	}
 }
 
-func newHole(wh evescout.Wormhole){
+func newHole(wh evescout.Wormhole) {
 	//log.Printf("New Wormhole - Sig: %v ID: %v", wh.SignatureID, wh.ID)
 
 	storage.DB.Update(func(tx *bbolt.Tx) error {
@@ -85,7 +85,7 @@ func newHole(wh evescout.Wormhole){
 
 	route, _, err := Eve.RoutesApi.GetRouteOriginDestination(context.Background(), wh.DestinationSolarSystem.ID, jita, nil)
 	if err == nil {
-		jumps := len(route)-1
+		jumps := len(route) - 1
 		if wh.DestinationSolarSystem.Security >= 0.5 {
 			if jumps <= 5 {
 				jumpsStr := fmt.Sprintf("%v jumps", strconv.Itoa(jumps))

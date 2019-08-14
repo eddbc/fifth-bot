@@ -6,11 +6,16 @@ import (
 	"go.etcd.io/bbolt"
 )
 
+//DB main storage object
 var DB *bbolt.DB
 
+//TimersKey bucket key for timers
 const TimersKey = "timers"
+
+//TheraHolesKey bucket key for thera holes
 const TheraHolesKey = "theraHoles"
 
+//DBInit Initialise bbolt storage buckets
 func DBInit() {
 	DB.Update(func(tx *bbolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(TimersKey))
@@ -28,6 +33,7 @@ func DBInit() {
 	})
 }
 
+//Put Save key/value pair to bucket
 func Put(bucket string, key string, data []byte) {
 	DB.Update(func(tx *bbolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
@@ -39,6 +45,7 @@ func Put(bucket string, key string, data []byte) {
 	})
 }
 
+//Get get value for key from bucket
 func Get(bucket string, key string) ([]byte, error) {
 	// Start the transaction.
 	r := make([]byte, 0)
@@ -62,7 +69,7 @@ func Get(bucket string, key string) ([]byte, error) {
 	return r, err
 }
 
-// Itob returns an 8-byte big endian representation of v.
+//Itob returns an 8-byte big endian representation of v.
 func Itob(v int) []byte {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, uint64(v))

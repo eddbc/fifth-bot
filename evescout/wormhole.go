@@ -2,6 +2,7 @@ package evescout
 
 import "time"
 
+//Wormhole Wormhole as reported by eve-scout.com
 type Wormhole struct {
 	ID                                int32       `json:"id"`
 	SignatureID                       string      `json:"signatureId"`

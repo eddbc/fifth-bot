@@ -10,7 +10,10 @@ import (
 	"net/http"
 )
 
+//Client HTTP Client
 var Client *http.Client
+
+//SSOAuthenticator EVE SSO Service
 var SSOAuthenticator *goesi.SSOAuthenticator
 var store = sessions.NewCookieStore([]byte("something-very-secret"))
 var scopes = []string{
@@ -20,6 +23,7 @@ var scopes = []string{
 	"esi-characters.read_notifications.v1",
 }
 
+//Load Start sso server
 func Load(id string, key string) {
 
 	SSOAuthenticator = goesi.NewSSOAuthenticator(Client, id, key, "http://localhost:8080/callback", scopes)
