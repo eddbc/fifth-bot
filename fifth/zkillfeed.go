@@ -24,8 +24,13 @@ var superTypes = []int32{
 
 var entitiesOfInterest = []int32{
 
+	// Alliances
+	99007126, // NOG8S
+
 	// Corps
 	98326834, // NOG8S
+	98539693, // NO0RE
+	98506452, // SCHNG
 
 	// Characters
 	91872672, // Edd Reynolds
