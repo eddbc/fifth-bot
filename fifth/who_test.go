@@ -29,11 +29,11 @@ func TestWhoCommand(t *testing.T) {
 		t.Error("Name does not match expected value")
 	}
 
-	if corp != "Avalanche." {
+	if corp != "black.listed" {
 		t.Error("Corp does not match expected value")
 	}
 
-	if alli != "Fraternity." {
+	if alli != "Pandemic Legion" {
 		t.Error("Alliance does not match expected value")
 	}
 }

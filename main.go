@@ -6,17 +6,17 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/antihax/goesi"
+	"github.com/antihax/goesi/esi"
+	"github.com/bwmarrin/discordgo"
 	"github.com/eddbc/fifth-bot/storage"
+	"github.com/gregjones/httpcache"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
-
-	"github.com/antihax/goesi"
-	"github.com/antihax/goesi/esi"
-	"github.com/bwmarrin/discordgo"
-	"github.com/gregjones/httpcache"
+	"time"
 
 	bolt "go.etcd.io/bbolt"
 
@@ -52,7 +52,10 @@ func init() {
 	// Set up caching for esi http client (in-memory for now)
 	transport := httpcache.NewTransport(httpcache.NewMemoryCache())
 	transport.Transport = &http.Transport{Proxy: http.ProxyFromEnvironment}
-	httpClient := &http.Client{Transport: transport}
+	httpClient := &http.Client{
+		Transport: transport,
+		Timeout:   time.Second * 15,
+	}
 	sso.Client = httpClient
 
 	// Get our API Client.
@@ -121,7 +124,7 @@ ___________.__  _____  __  .__   __________        __
 		os.Exit(1)
 	}
 
-	Session.UpdateStatus(0, "Eve Online 2 (Beta)")
+	_ = Session.UpdateStatus(0, "Eve Online 2 (Beta)")
 
 	fifth.Session = Session
 	fifth.Debug = debug
@@ -141,7 +144,7 @@ ___________.__  _____  __  .__   __________        __
 	<-sc
 
 	// Clean up
-	Session.Close()
+	_ = Session.Close()
 
 	// Exit Normally.
 }
