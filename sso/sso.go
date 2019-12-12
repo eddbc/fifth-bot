@@ -1,39 +1,40 @@
 package sso
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/gob"
 	"fmt"
 	"github.com/antihax/goesi"
+	"github.com/bwmarrin/discordgo"
+	"github.com/eddbc/fifth-bot/db"
 	"github.com/gorilla/sessions"
+	"go.mongodb.org/mongo-driver/bson"
+	"golang.org/x/oauth2"
 	"log"
 	"net/http"
 )
 
-//Client HTTP Client
 var Client *http.Client
-
-//SSOAuthenticator EVE SSO Service
+var Session *discordgo.Session
 var SSOAuthenticator *goesi.SSOAuthenticator
 var store = sessions.NewCookieStore([]byte("something-very-secret"))
 var scopes = []string{
 	"publicData",
 	"esi-location.read_location.v1",
 	"esi-location.read_ship_type.v1",
-	"esi-characters.read_notifications.v1",
 }
 
-//Load Start sso server
 func Load(id string, key string) {
 
-	SSOAuthenticator = goesi.NewSSOAuthenticator(Client, id, key, "http://localhost:8080/callback", scopes)
+	gob.Register(goesi.VerifyResponse{})
+
+	SSOAuthenticator = goesi.NewSSOAuthenticatorV2(Client, id, key, "http://localhost:8080/callback", scopes)
 	if SSOAuthenticator == nil {
 		log.Fatal("Failed to create SSO Authenticator")
 	}
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "<a href=\"/login\">login to fifth-bot</a>")
-	})
-	http.HandleFunc("/login", loginHandler)
+	http.HandleFunc("/", loginHandler)
 	http.HandleFunc("/callback", callbackHandler)
 	log.Printf(`SSO server running`)
 	log.Fatal(http.ListenAndServe(":8080", nil))
@@ -41,6 +42,13 @@ func Load(id string, key string) {
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	s, _ := store.Get(r, "session-name")
+
+	id := r.URL.Query()["id"]
+	if id == nil {
+		return
+	}
+
+	s.Values["id"] = id[0]
 
 	// Generate a random state string
 	b := make([]byte, 16)
@@ -87,8 +95,6 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//token.
-
 	// Obtain a token source (automaticlly pulls refresh as needed)
 	tokSrc := SSOAuthenticator.TokenSource(token)
 	if err != nil {
@@ -96,7 +102,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		//return http.StatusInternalServerError, err
 	}
 
-	tokSrc.Token()
+	//tokSrc.Token()
 
 	// Assign an auth context to the calls
 	//auth := context.WithValue(context.TODO(), goesi.ContextOAuth2, tokSrc.Token)
@@ -108,21 +114,91 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		//return http.StatusInternalServerError, err
 	}
 
-	if err != nil {
-		return
-		//return http.StatusInternalServerError, err
-	}
-
 	// Save the verification structure on the session for quick access.
 	s.Values["character"] = v
 	err = s.Save(r, w)
 	if err != nil {
+		log.Print(err)
 		return
 		//return http.StatusInternalServerError, err
 	}
+
+	count, err := db.Db().Collection("tokens").CountDocuments(context.TODO(), bson.D{
+		{"characterid",v.CharacterID},
+	})
+	if count == 0 {
+		_,err = db.Db().Collection("tokens").InsertOne(context.TODO(), UserToken{v.CharacterID,token})
+		if err != nil {
+			log.Print(err)
+		}
+	} else {
+		_,err = db.Db().Collection("tokens").UpdateOne(context.TODO(), bson.D{
+			{"characterid",v.CharacterID},
+		}, bson.D{{
+			"$set", bson.D{{
+				"token", token,
+			}},
+		}})
+		if err != nil {
+			log.Print(err)
+		}
+	}
+
+	discordId := s.Values["id"].(string)
+
+	_,err = db.Db().Collection("discord").InsertOne(context.TODO(), DiscordUser{v.CharacterID, discordId})
+	if err != nil {
+		log.Print(err)
+	}
+
+	usr, err := Session.User(discordId)
+
+	fmt.Fprintf(w, "discord user %+v signed in as eve user %v", usr.Username, v.CharacterName)
 
 	// Redirect to the account page.
 	//http.Redirect(w, r, "/account", 302)
 	return
 	//return http.StatusMovedPermanently, nil
+}
+
+func GetTokenForDiscordUser(userID string) (ut UserToken, err error) {
+	var du DiscordUser
+
+	err = db.Db().Collection("discord").FindOne(context.TODO(), bson.D{{"discordid", userID}}).Decode(&du)
+	if err == nil {
+		err = db.Db().Collection("tokens").FindOne(context.TODO(), bson.D{{"characterid", du.CharacterId}}).Decode(&ut)
+	}
+
+	if err != nil {
+		log.Print(err)
+		return
+	}
+
+	return
+}
+
+func AuthContext(ut UserToken) (c context.Context) {
+	src := SSOAuthenticator.TokenSource(ut.Token)
+	c = context.WithValue(context.Background(), goesi.ContextOAuth2, src)
+	return
+}
+
+func UpdateToken(char int32, tkn *oauth2.Token) (err error) {
+	_,err = db.Db().Collection("tokens").UpdateOne(context.TODO(), bson.D{
+		{"characterid",char},
+	}, bson.D{{
+		"$set", bson.D{{
+			"token", tkn,
+		}},
+	}})
+	return
+}
+
+type UserToken struct {
+	CharacterId int32 `json:"characterid"`
+	Token *oauth2.Token `json:"token"`
+}
+type DiscordUser struct {
+	CharacterId int32  `json:"characterid"`
+	DiscordId string  `json:"discordid"`
 }

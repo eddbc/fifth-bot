@@ -15,8 +15,8 @@ const TimersKey = "timers"
 //TheraHolesKey bucket key for thera holes
 const TheraHolesKey = "theraHoles"
 
-//DBInit Initialise bbolt storage buckets
-func DBInit() {
+//StorageInit Initialise bbolt storage buckets
+func Init() {
 	DB.Update(func(tx *bbolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(TimersKey))
 		if err != nil {

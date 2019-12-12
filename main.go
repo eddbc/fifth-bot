@@ -130,7 +130,7 @@ ___________.__  _____  __  .__   __________        __
 	fifth.Debug = debug
 	storage.DB = db
 
-	storage.DBInit()
+	storage.Init()
 
 	// Open ZKill websocket for new killmails
 	go fifth.ListenZKill()
