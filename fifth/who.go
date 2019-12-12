@@ -75,6 +75,9 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 	stats, e := zkillstats.get(cid)
 	if e == nil {
 		topShips := ""
+		recentShips := ""
+		topSystems := ""
+		recentSystems := ""
 		var capsFlown []string
 		var supersFlown []string
 		for _, st := range stats.TopAllTime {
@@ -101,6 +104,21 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 			}
 		}
 
+		for _, recent := range stats.TopLists[3].Values {
+			recentShips = fmt.Sprintf("%v%v: %v kills\n", recentShips, recent.Name, recent.Kills)
+		}
+
+		for _, recent := range stats.TopLists[4].Values {
+			recentSystems = fmt.Sprintf("%v%v: %v kills\n", recentSystems, recent.Name, recent.Kills)
+		}
+
+		for _, recent := range stats.TopAllTime[5].Data[0:5] {
+			sys, _, err := Eve.UniverseApi.GetUniverseSystemsSystemId(ctx, int32(recent.SolarSystemID), nil)
+			if err == nil {
+				topSystems = fmt.Sprintf("%v%v: %v kills\n", topSystems, sys.Name, recent.Kills)
+			}
+		}
+
 		elapsed := time.Since(start)
 		if Debug {
 			log.Printf("Stats took %s", elapsed)
@@ -108,8 +126,8 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 
 		if len(capsFlown) > 0 {
 			c := ""
-			for _, cap := range capsFlown {
-				c = fmt.Sprintf("%v%v\n", c, cap)
+			for _, capital := range capsFlown {
+				c = fmt.Sprintf("%v%v\n", c, capital)
 			}
 			fields = append(fields, &discordgo.MessageEmbedField{
 				Name:   "Caps Flown",
@@ -130,10 +148,34 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 			})
 		}
 
+		if recentShips != "" {
+			fields = append(fields, &discordgo.MessageEmbedField{
+				Name:   "Recent Ships",
+				Value:  fmt.Sprintf("%s", recentShips),
+				Inline: true,
+			})
+		}
+
 		if topShips != "" {
 			fields = append(fields, &discordgo.MessageEmbedField{
 				Name:   "Top Ships",
 				Value:  fmt.Sprintf("%s", topShips),
+				Inline: true,
+			})
+		}
+
+		if recentShips != "" {
+			fields = append(fields, &discordgo.MessageEmbedField{
+				Name:   "Recent Systems",
+				Value:  fmt.Sprintf("%s", recentSystems),
+				Inline: true,
+			})
+		}
+
+		if topShips != "" {
+			fields = append(fields, &discordgo.MessageEmbedField{
+				Name:   "Top Systems",
+				Value:  fmt.Sprintf("%s", topSystems),
 				Inline: true,
 			})
 		}
@@ -148,13 +190,13 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 	}
 
 	fields = append(fields, &discordgo.MessageEmbedField{
-		Name:   "zKill",
-		Value:  fmt.Sprintf("https://zkillboard.com/character/%v/", cid),
+		Name:   "EveWho",
+		Value:  fmt.Sprintf("https://evewho.com/pilot/%v/", url.QueryEscape(char.Name)),
 		Inline: true,
 	})
 	fields = append(fields, &discordgo.MessageEmbedField{
-		Name:   "EveWho",
-		Value:  fmt.Sprintf("https://evewho.com/pilot/%v/", url.QueryEscape(char.Name)),
+		Name:   "zKill",
+		Value:  fmt.Sprintf("https://zkillboard.com/character/%v/", cid),
 		Inline: true,
 	})
 

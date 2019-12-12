@@ -1027,7 +1027,8 @@ type zKillCharacterStatsResp struct {
 			Kills int `json:"kills"`
 			//CharacterID   int    `json:"characterID"`
 			//CorporationID int    `json:"corporationID"`
-			ShipTypeID int `json:"shipTypeID"`
+			ShipTypeID    int `json:"shipTypeID"`
+			SolarSystemID int `json:"solarSystemID"`
 		} `json:"data"`
 	} `json:"topAllTime"`
 	Trophies struct {
