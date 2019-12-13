@@ -33,7 +33,7 @@ var entitiesOfInterest = []int32{
 	98506452, // SCHNG
 
 	// Characters
-	91872672, // Edd Reynolds
+	//91872672, // Edd Reynolds
 
 	// Testing Groups
 	//1354830081, // goons
