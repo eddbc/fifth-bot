@@ -43,12 +43,12 @@ func Load(id string, key string) {
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	s, _ := store.Get(r, "session-name")
 
-	id := r.URL.Query()["id"]
-	if id == nil {
+	discordId := r.URL.Query()["id"]
+	if discordId == nil {
 		return
 	}
 
-	s.Values["id"] = id[0]
+	s.Values["id"] = discordId[0]
 
 	// Generate a random state string
 	b := make([]byte, 16)
@@ -151,7 +151,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 	}
 
-	usr, err := Session.User(discordId)
+	usr, _ := Session.User(discordId)
 
 	fmt.Fprintf(w, "discord user %+v signed in as eve user %v", usr.Username, v.CharacterName)
 
