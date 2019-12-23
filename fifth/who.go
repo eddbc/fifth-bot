@@ -112,10 +112,12 @@ func getCharacterInfoEmbed(name string) (*discordgo.MessageEmbed, error) {
 			recentSystems = fmt.Sprintf("%v%v: %v kills\n", recentSystems, recent.Name, recent.Kills)
 		}
 
-		for _, recent := range stats.TopAllTime[5].Data[0:5] {
-			sys, _, err := Eve.UniverseApi.GetUniverseSystemsSystemId(ctx, int32(recent.SolarSystemID), nil)
-			if err == nil {
-				topSystems = fmt.Sprintf("%v%v: %v kills\n", topSystems, sys.Name, recent.Kills)
+		if stats.TopAllTime != nil {
+			for _, recent := range stats.TopAllTime[5].Data[0:5] {
+				sys, _, err := Eve.UniverseApi.GetUniverseSystemsSystemId(ctx, int32(recent.SolarSystemID), nil)
+				if err == nil {
+					topSystems = fmt.Sprintf("%v%v: %v kills\n", topSystems, sys.Name, recent.Kills)
+				}
 			}
 		}
 

@@ -9,6 +9,7 @@ import (
 	"log"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 // GetCurrentTheraHoles Bot command to list currently active thera holes, with optional ranges to a target system
@@ -16,16 +17,17 @@ func (f *Fifth) GetCurrentTheraHoles(ds *discordgo.Session, dm *discordgo.Messag
 
 	targetSystem := int32(0)
 	if len(ctx.Fields) > 1 {
-		strings := []string{"solar_system"}
-		res, _, err := Eve.SearchApi.GetSearch(context.Background(), strings, ctx.Fields[1], nil)
+		searchTypes := []string{"solar_system"}
+		searchString := ctx.Fields[1]
+		res, _, err := Eve.SearchApi.GetSearch(context.Background(), searchTypes, searchString, nil)
 		if err != nil {
 			log.Printf("Error searching for system: %v", err)
-			SendMsgToChan(dm.ChannelID, "Error searching for system")
+			_, _ = SendMsgToChan(dm.ChannelID, "Error searching for system")
 			return
 		}
 
 		if len(res.SolarSystem) == 0 {
-			SendMsgToChan(dm.ChannelID, "Couldn't find that system")
+			_, _ = SendMsgToChan(dm.ChannelID, "Couldn't find that system")
 			return
 		}
 
@@ -34,15 +36,22 @@ func (f *Fifth) GetCurrentTheraHoles(ds *discordgo.Session, dm *discordgo.Messag
 			for _, s := range res.SolarSystem {
 				system, _, err := Eve.UniverseApi.GetUniverseSystemsSystemId(context.Background(), s, nil)
 				if err == nil {
-					systems = fmt.Sprintf("%v \n%v", systems, system.Name)
+					if strings.ToLower(system.Name) == strings.ToLower(searchString) {
+						targetSystem = system.SystemId
+					} else {
+						systems = fmt.Sprintf("%v \n%v", systems, system.Name)
+					}
 
 				}
 			}
-			SendMsgToChan(dm.ChannelID, fmt.Sprintf("Found %v possible matches : %v", len(res.SolarSystem), systems))
-			return
+			if targetSystem == int32(0) {
+				_, _ = SendMsgToChan(dm.ChannelID, fmt.Sprintf("Found %v possible matches : %v", len(res.SolarSystem), systems))
+				return
+			}
+		} else {
+			targetSystem = res.SolarSystem[0]
 		}
 
-		targetSystem = res.SolarSystem[0]
 	}
 
 	holes, err := evescout.GetTheraHoles()
