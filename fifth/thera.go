@@ -41,7 +41,6 @@ func (f *Fifth) GetCurrentTheraHoles(ds *discordgo.Session, dm *discordgo.Messag
 					} else {
 						systems = fmt.Sprintf("%v \n%v", systems, system.Name)
 					}
-
 				}
 			}
 			if targetSystem == int32(0) {

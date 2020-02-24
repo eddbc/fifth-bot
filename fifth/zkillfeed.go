@@ -22,24 +22,7 @@ var superTypes = []int32{
 //	1538, // FAX
 //}
 
-var entitiesOfInterest = []int32{
-
-	// Alliances
-	99007126, // NOG8S
-
-	// Corps
-	98326834, // NOG8S
-	98539693, // NO0RE
-	98506452, // SCHNG
-
-	// Characters
-	//91872672, // Edd Reynolds
-
-	// Testing Groups
-	//1354830081, // goons
-	//99005338,	// horde
-	//498125261, // test
-}
+var entitiesOfInterest []TrackedEntity
 
 //var stagingSystems = []int32{
 //	30000974, // H-8F5Q
@@ -60,6 +43,10 @@ func ListenZKill() {
 	if err != nil {
 		log.Fatal("Error starting zKillboard websocket: ", err)
 	}
+
+	presetEntries()
+	entitiesOfInterest = getTrackedEntities()
+	log.Printf("%v", entitiesOfInterest)
 
 	log.Printf("zKillboard feed running")
 
@@ -259,6 +246,7 @@ func isExpensive(km *Kill) bool {
 }
 
 func isEntityRelated(km *Kill) (kill bool, loss bool, err error) {
+	entitiesOfInterest = getTrackedEntities()
 	kill = false
 	loss = false
 
@@ -270,9 +258,9 @@ func isEntityRelated(km *Kill) (kill bool, loss bool, err error) {
 		}
 	}()
 
-	for _, id := range entitiesOfInterest {
-		kill = kill || km.isAttacker(id)
-		loss = loss || km.isVictim(id)
+	for _, entity := range entitiesOfInterest {
+		kill = kill || km.isAttacker(entity.id)
+		loss = loss || km.isVictim(entity.id)
 	}
 
 	return kill, loss, err

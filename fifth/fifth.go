@@ -8,6 +8,7 @@ import (
 	"github.com/eddbc/fifth-bot/esistatus"
 	"github.com/eddbc/fifth-bot/mux"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -59,7 +60,7 @@ func (f *Fifth) Status(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Co
 		}
 
 		if r > 0 || y > 0 {
-			msg = fmt.Sprintf("%v\n(%v :white_check_mark:,  %v :warning:,  %v :broken_heart:)\n", msg, g, y, r)
+			msg = fmt.Sprintf("%v\n(ESI Endpoints - %v :white_check_mark:,  %v :warning:,  %v :broken_heart:)\n", msg, g, y, r)
 		}
 	}
 
@@ -131,6 +132,37 @@ func (f *Fifth) SetStatus(ds *discordgo.Session, dm *discordgo.Message, ctx *mux
 	}
 
 	ds.UpdateStatus(0, status)
+}
+
+func (f *Fifth) ListZKillTracked(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
+
+	entitiesOfInterest = getTrackedEntities()
+	entStr := ""
+	for _,e := range entitiesOfInterest {
+		entStr = fmt.Sprintf("%v\n%v", entStr,e.name)
+	}
+	_,_ = SendMsgToChan(dm.ChannelID, fmt.Sprintf("```%v```", entStr))
+}
+
+func (f *Fifth) AddZKillTracked(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
+
+	name := ""
+
+	for k, v := range ctx.Fields {
+		if k != 0 {
+			name += v
+			if k < len(ctx.Fields) {
+				name += " "
+			}
+		}
+	}
+
+	err := addTrackedEntityByName(strings.TrimSpace(name))
+	if err == nil {
+		_,_ = SendMsgToChan(dm.ChannelID, fmt.Sprintf("Added to list"))
+	} else {
+		_,_ = SendMsgToChan(dm.ChannelID, fmt.Sprintf("Error: %v", err))
+	}
 }
 
 //Servers Bot command to list currently connected servers

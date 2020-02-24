@@ -31,10 +31,18 @@ func routes() {
 	Router.Route("who", "Get info about an EVE character", f.Who)
 	Router.Route("thera", "List Current Thera Holes", f.GetCurrentTheraHoles)
 	Router.Route("range", "Get ranges for various ship types from a given system", f.Range)
+	Router.Route("zkill-list", "List zKill feed tracked entities", f.ListZKillTracked)
+	Router.Route("zkill-add", "Add to the list of tracked zKill entities", f.AddZKillTracked)
+
+	// Disabled Timer Commands
 	//Router.Route("timer", "Add a timer with format: \"!timer 2d 6h 15m description and location goes here\"", f.AddTimer)
 	//Router.Route("timers", "List Timers with format \"description - date (time left) [ID]\"", f.ListTimers)
 	//Router.Route("timer-remove", "Remove a timer with a given ID", f.RemoveTimer)
+
+	// Unlisted commands (A command with no description will not show up in the !help list of commands
 	Router.Route("servers", "", f.Servers)
+
+	// Debug commands (only enabled in debug mode)
 	if debug {
 		Router.Route("test", "", f.EmoteTest)
 		Router.Route("supers", "Search public contracts in a region for super capitals", f.SearchCapitalContracts)

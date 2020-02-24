@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"encoding/binary"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -59,11 +58,4 @@ func DBInit() {
 
 func Db() *mongo.Database {
 	return db.Database("FleetBot")
-}
-
-// Itob returns an 8-byte big endian representation of v.
-func Itob(v int) []byte {
-	b := make([]byte, 8)
-	binary.BigEndian.PutUint64(b, uint64(v))
-	return b
 }

@@ -15,6 +15,9 @@ const TimersKey = "timers"
 //TheraHolesKey bucket key for thera holes
 const TheraHolesKey = "theraHoles"
 
+//ZKillTrackedKey bucket key for zkill feed tracked entities
+const ZKillTrackedKey = "zKillTracked"
+
 //StorageInit Initialise bbolt storage buckets
 func Init() {
 	DB.Update(func(tx *bbolt.Tx) error {
@@ -26,6 +29,13 @@ func Init() {
 	})
 	DB.Update(func(tx *bbolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(TheraHolesKey))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
+		return nil
+	})
+	DB.Update(func(tx *bbolt.Tx) error {
+		_, err := tx.CreateBucketIfNotExists([]byte(ZKillTrackedKey))
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
 		}
@@ -74,4 +84,9 @@ func Itob(v int) []byte {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, uint64(v))
 	return b
+}
+
+func Btoi(b []byte) int {
+	v := binary.BigEndian.Uint64(b)
+	return int(v)
 }
