@@ -20,6 +20,9 @@ func init() {
 	esiClient := goesi.NewAPIClient(client, useragent)
 	Eve = esiClient.ESI
 
+	// Enable testing mode
+	Debug = true
+
 	db, err := bolt.Open("../fifth.db", 0600, nil)
 	if err != nil {
 		log.Fatal(err)

@@ -56,9 +56,9 @@ func TestSystemRange(t *testing.T) {
 
 func TestInterestingKill(t *testing.T) {
 
-	entitiesOfInterest = []int32{
-		1354830081, // goons
-		99005338,   // horde
+	entitiesOfInterest = []TrackedEntity{
+		{id: 1354830081, name: "Goonswarm Federation"},
+		{id: 99005338, name: "Pandemic Horde"},
 	}
 
 	kill1, err := getKill1()
