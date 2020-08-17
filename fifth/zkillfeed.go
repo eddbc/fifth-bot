@@ -30,7 +30,7 @@ var entitiesOfInterest []TrackedEntity
 
 //ListenZKill Start live zKill feed
 func ListenZKill() {
-	url := "wss://zkillboard.com:2096"
+	url := "wss://zkillboard.com/websocket/"
 	c, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
 		log.Fatal("dial:", err)
