@@ -34,7 +34,7 @@ func (f *Fifth) SearchCapitalContracts(ds *discordgo.Session, dm *discordgo.Mess
 	rgnID := sres.Region[0]
 
 	region, _, err := Eve.UniverseApi.GetUniverseRegionsRegionId(ctx, rgnID, nil)
-	_, err = ds.ChannelMessageSend(dm.ChannelID,
+	_, err = SendMsgToChan(dm.ChannelID,
 		fmt.Sprintf("Searching for contracts in %v... (May take a while)", region.Name),
 	)
 
@@ -44,13 +44,13 @@ func (f *Fifth) SearchCapitalContracts(ds *discordgo.Session, dm *discordgo.Mess
 	}
 
 	log.Printf("%v contracts found", len(contracts))
-	_, err = ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("%v contracts found", len(contracts)))
+	_, err = SendMsgToChan(dm.ChannelID, fmt.Sprintf("%v contracts found", len(contracts)))
 
 	msg := ""
 	for _, contract := range contracts {
 		msg = msg + makeContractMessage(contract) + "\n"
 	}
-	_, err = ds.ChannelMessageSend(dm.ChannelID, msg)
+	_, err = SendMsgToChan(dm.ChannelID, msg)
 }
 
 func getAllContracts() {

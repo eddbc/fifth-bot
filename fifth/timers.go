@@ -52,20 +52,20 @@ func (f *Fifth) AddTimer(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.
 
 		if err != nil {
 			log.Println("Invalid Timer")
-			ds.ChannelMessageSend(dm.ChannelID, "Invalid Time Given")
+			SendMsgToChan(dm.ChannelID, "Invalid Time Given")
 			return
 		}
 	}
 
 	if d > 16 || h > 23 || m > 59 {
 		log.Println("Invalid Timer")
-		ds.ChannelMessageSend(dm.ChannelID, "Invalid Time Given")
+		SendMsgToChan(dm.ChannelID, "Invalid Time Given")
 		return
 	}
 
 	if desc == "" {
 		log.Println("Invalid Timer")
-		ds.ChannelMessageSend(dm.ChannelID, "Invalid Description Given")
+		SendMsgToChan(dm.ChannelID, "Invalid Description Given")
 		return
 	}
 
@@ -78,7 +78,7 @@ func (f *Fifth) AddTimer(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.
 
 	s := fmt.Sprintf("Set timer for %v with description \"%s\"", then.Format("Jan 2, 15:04"), desc)
 	log.Println(s)
-	ds.ChannelMessageSend(dm.ChannelID, s)
+	SendMsgToChan(dm.ChannelID, s)
 
 	saveTimer(timer{Time: then, Description: desc, Pinged: false})
 }
@@ -113,7 +113,7 @@ func (f *Fifth) ListTimers(ds *discordgo.Session, dm *discordgo.Message, ctx *mu
 	resp += "```"
 	log.Println(resp)
 	SendMsgToChan(dm.ChannelID, resp)
-	//ds.ChannelMessageSend(dm.ChannelID, resp)
+	//SendMsgToChan(dm.ChannelID, resp)
 }
 
 // RemoveTimer bot command to remove a timer from the timer board

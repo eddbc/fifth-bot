@@ -35,7 +35,7 @@ func (f *Fifth) Status(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Co
 
 	if err != nil {
 		log.Printf("error getting TQ status, %s\n", err)
-		_, err = ds.ChannelMessageSend(dm.ChannelID, "Error getting TQ status! The logs show nothing...\n")
+		_, err = SendMsgToChan(dm.ChannelID, "Error getting TQ status! The logs show nothing...\n")
 		return
 	}
 
@@ -64,7 +64,7 @@ func (f *Fifth) Status(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Co
 		}
 	}
 
-	_, err = ds.ChannelMessageSend(dm.ChannelID, msg)
+	_, err = SendMsgToChan(dm.ChannelID, msg)
 }
 
 //EveTime bot command to give current EVE time, or time until given EVE time
@@ -76,7 +76,7 @@ func (f *Fifth) EveTime(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.C
 	etStr := et.Format("15:04")
 
 	if len(ctx.Fields) == 1 {
-		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Current EVE Time: **%v**\n", etStr))
+		SendMsgToChan(dm.ChannelID, fmt.Sprintf("Current EVE Time: **%v**\n", etStr))
 	} else {
 		dd := et.Format("2006/01/02")
 		tt := ctx.Fields[1]
@@ -87,7 +87,7 @@ func (f *Fifth) EveTime(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.C
 
 		log.Printf("target time %v for input %v", target, ctx.Fields[1])
 		timeTil := target.Sub(et)
-		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Time until %v EVE: **%v**. You should probably learn simple maths and figure it out yourself though.\n(Current EVE Time: %v)", target.Format("15:04"), fmtDuration(timeTil), etStr))
+		SendMsgToChan(dm.ChannelID, fmt.Sprintf("Time until %v EVE: **%v**. You should probably learn simple maths and figure it out yourself though.\n(Current EVE Time: %v)", target.Format("15:04"), fmtDuration(timeTil), etStr))
 	}
 
 }
@@ -114,7 +114,7 @@ func (f *Fifth) Who(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Conte
 			log.Printf("error: %+v", err)
 		}
 	} else {
-		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Error :warning: %s\n", err))
+		SendMsgToChan(dm.ChannelID, fmt.Sprintf("Error :warning: %s\n", err))
 	}
 }
 
@@ -138,10 +138,10 @@ func (f *Fifth) ListZKillTracked(ds *discordgo.Session, dm *discordgo.Message, c
 
 	entitiesOfInterest = getTrackedEntities()
 	entStr := ""
-	for _,e := range entitiesOfInterest {
-		entStr = fmt.Sprintf("%v\n%v", entStr,e.name)
+	for _, e := range entitiesOfInterest {
+		entStr = fmt.Sprintf("%v\n%v", entStr, e.name)
 	}
-	_,_ = SendMsgToChan(dm.ChannelID, fmt.Sprintf("```%v```", entStr))
+	_, _ = SendMsgToChan(dm.ChannelID, fmt.Sprintf("```%v```", entStr))
 }
 
 func (f *Fifth) AddZKillTracked(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {
@@ -159,9 +159,9 @@ func (f *Fifth) AddZKillTracked(ds *discordgo.Session, dm *discordgo.Message, ct
 
 	err := addTrackedEntityByName(strings.TrimSpace(name))
 	if err == nil {
-		_,_ = SendMsgToChan(dm.ChannelID, fmt.Sprintf("Added to list"))
+		_, _ = SendMsgToChan(dm.ChannelID, fmt.Sprintf("Added to list"))
 	} else {
-		_,_ = SendMsgToChan(dm.ChannelID, fmt.Sprintf("Error: %v", err))
+		_, _ = SendMsgToChan(dm.ChannelID, fmt.Sprintf("Error: %v", err))
 	}
 }
 

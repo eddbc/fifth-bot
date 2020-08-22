@@ -1,5 +1,6 @@
 /.idea/
 /fifth-bot*
 /.env
+/build/
 deploy.sh
 *.db

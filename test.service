@@ -1,0 +1,29 @@
+[Unit]
+Description=Fifth-Bot service
+ConditionPathExists=/home/forge/fifth-bot/fifth-bot
+After=network.target
+
+[Service]
+Type=simple
+User=forge
+Group=forge
+LimitNOFILE=1024
+
+Restart=on-failure
+RestartSec=10
+startLimitIntervalSec=60
+
+WorkingDirectory=/home/forge/fifth-bot
+ExecStart=/home/forge/fifth-bot/fifth-bot
+
+# make sure log directory exists and owned by syslog
+PermissionsStartOnly=true
+ExecStartPre=/bin/mkdir -p /var/log/fifth-bot
+ExecStartPre=/bin/chown syslog:adm /var/log/fifth-bot
+ExecStartPre=/bin/chmod 755 /var/log/fifth-bot
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=fifth-bot
+
+[Install]
+WantedBy=multi-user.target

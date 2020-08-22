@@ -34,6 +34,10 @@ func (z zKillCharStats) get(id int32) (*zKillCharacterStatsResp, error) {
 		return nil, getErr
 	}
 
+	if res.StatusCode == 429 {
+		return nil, fmt.Errorf("ZKillboard API Rate Limit")
+	}
+
 	body, _ := ioutil.ReadAll(res.Body)
 	stats := zKillCharacterStatsResp{}
 	jsonErr := json.Unmarshal(body, &stats)

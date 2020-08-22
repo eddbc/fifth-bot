@@ -33,6 +33,7 @@ func routes() {
 	Router.Route("range", "Get ranges for various ship types from a given system", f.Range)
 	Router.Route("zkill-list", "List zKill feed tracked entities", f.ListZKillTracked)
 	Router.Route("zkill-add", "Add to the list of tracked zKill entities", f.AddZKillTracked)
+	Router.Route("scrape", "Scrape a corp for supers/titans", f.ScrapeCorpSupers)
 
 	// Disabled Timer Commands
 	//Router.Route("timer", "Add a timer with format: \"!timer 2d 6h 15m description and location goes here\"", f.AddTimer)

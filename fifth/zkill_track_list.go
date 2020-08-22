@@ -9,7 +9,7 @@ import (
 )
 
 type TrackedEntity struct {
-	id int32
+	id   int32
 	name string
 }
 
@@ -27,7 +27,7 @@ func presetEntries() {
 		// Characters
 		91872672, // Edd Reynolds
 	}
-	for _,e := range presets {
+	for _, e := range presets {
 		err := addTrackedEntityByID(e)
 		if err != nil {
 			log.Print(err)
@@ -48,34 +48,34 @@ func getTrackedEntities() (trackedEntities []TrackedEntity) {
 		})
 		return nil
 	})
-	if Debug {
-		trackedEntities = append(trackedEntities, getTestingEntities()...)
-	}
+	//if Debug {
+	//	trackedEntities = append(trackedEntities, getTestingEntities()...)
+	//}
 	return
 }
 
-func getTestingEntities()(testingEntities []TrackedEntity) {
-	testingEntities = append(testingEntities, TrackedEntity{
-		id:   1354830081,
-		name: "goons",
-	})
+//func getTestingEntities()(testingEntities []TrackedEntity) {
+//	testingEntities = append(testingEntities, TrackedEntity{
+//		id:   1354830081,
+//		name: "goons",
+//	})
+//
+//	testingEntities = append(testingEntities, TrackedEntity{
+//		id:   99005338,
+//		name: "horde",
+//	})
+//
+//	testingEntities = append(testingEntities, TrackedEntity{
+//		id:   498125261,
+//		name: "test",
+//	})
+//
+//	return
+//}
 
-	testingEntities = append(testingEntities, TrackedEntity{
-		id:   99005338,
-		name: "horde",
-	})
-
-	testingEntities = append(testingEntities, TrackedEntity{
-		id:   498125261,
-		name: "test",
-	})
-
-	return
-}
-
-func addTrackedEntityByID(id int32) (err error){
+func addTrackedEntityByID(id int32) (err error) {
 	var i = []int32{id}
-	res,_,err := Eve.UniverseApi.PostUniverseNames(context.Background(), i,  nil)
+	res, _, err := Eve.UniverseApi.PostUniverseNames(context.Background(), i, nil)
 	if err == nil {
 		addTrackedEntity(id, res[0].Name)
 	}
@@ -83,9 +83,9 @@ func addTrackedEntityByID(id int32) (err error){
 	return
 }
 
-func addTrackedEntityByName(name string) (err error){
+func addTrackedEntityByName(name string) (err error) {
 	var n = []string{name}
-	res,_,err := Eve.UniverseApi.PostUniverseIds(context.Background(), n, nil)
+	res, _, err := Eve.UniverseApi.PostUniverseIds(context.Background(), n, nil)
 	if err == nil {
 		l := len(res.Characters) + len(res.Alliances) + len(res.Corporations)
 		if l == 0 {
@@ -95,7 +95,7 @@ func addTrackedEntityByName(name string) (err error){
 		} else {
 			if len(res.Characters) == 1 {
 				addTrackedEntity(res.Characters[0].Id, res.Characters[0].Name)
-			}else if len(res.Corporations) == 1 {
+			} else if len(res.Corporations) == 1 {
 				addTrackedEntity(res.Corporations[0].Id, res.Corporations[0].Name)
 			} else if len(res.Alliances) == 1 {
 				addTrackedEntity(res.Alliances[0].Id, res.Alliances[0].Name)

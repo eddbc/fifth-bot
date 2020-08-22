@@ -53,7 +53,7 @@ func (f *Fifth) Range(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Con
 		for _, class := range classes {
 			ranges = fmt.Sprintf("%v\n%v : <http://evemaps.dotlan.net/range/%v,5/%v/>", ranges, class.size, class.class, system.Name)
 		}
-		ds.ChannelMessageSend(dm.ChannelID, fmt.Sprintf("Ranges from %v: %v", system.Name, ranges))
+		SendMsgToChan(dm.ChannelID, fmt.Sprintf("Ranges from %v: %v", system.Name, ranges))
 	}
 
 }
