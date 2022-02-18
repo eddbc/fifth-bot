@@ -131,7 +131,7 @@ func (f *Fifth) SetStatus(ds *discordgo.Session, dm *discordgo.Message, ctx *mux
 		}
 	}
 
-	ds.UpdateStatus(0, status)
+	_ = ds.UpdateGameStatus(0, status)
 }
 
 func (f *Fifth) ListZKillTracked(ds *discordgo.Session, dm *discordgo.Message, ctx *mux.Context) {

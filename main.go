@@ -35,7 +35,7 @@ var debug = false
 // Session is declared in the global space so it can be easily used
 // throughout this program.
 // In this use case, there is no error that would be returned.
-var Session, _ = discordgo.New()
+var Session *discordgo.Session
 
 var eve *esi.APIClient
 var httpClient *http.Client
@@ -64,10 +64,11 @@ func init() {
 	fifth.Eve = eve
 
 	// Discord Authentication Token
-	Session.Token = os.Getenv("FTH_BT_TOKEN")
-	if Session.Token == "" {
-		flag.StringVar(&Session.Token, "t", "", "Discord Authentication Token")
+	var token = os.Getenv("FTH_BT_TOKEN")
+	if token == "" {
+		flag.StringVar(&token, "t", "", "Discord Authentication Token")
 	}
+	Session, _ = discordgo.New(token)
 }
 
 func main() {
@@ -124,7 +125,7 @@ ___________.__  _____  __  .__   __________        __
 		os.Exit(1)
 	}
 
-	_ = Session.UpdateStatus(0, "Eve Online 2 (Beta)")
+	_ = Session.UpdateGameStatus(0, "Eve Online 2 (Beta)")
 
 	fifth.Session = Session
 	fifth.Debug = debug
